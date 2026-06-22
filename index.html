@@ -477,6 +477,7 @@
               </div>
             </div>
             <div class="grid2">
+              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida-2" placeholder="550" oninput="window.updateDias2()"></div>
               <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd2" placeholder="1,450" oninput="window.updateDias2()"><span class="suffix">kg/dia</span></div>
               <div class="field">
                 <label>Dias de trato <span style="color:var(--gold);font-size:11px;">(calculado automaticamente)</span></label>
@@ -499,7 +500,7 @@
               </div>
             </div>
             <div class="grid2">
-              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida" placeholder="550" oninput="window.updateDias2()"></div>
+              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida" placeholder="550" oninput="window.syncPesoSaida(this)"></div>
               <div class="field field-inline"><label>RC de saída</label><input type="number" step="any" class="num-input" id="f-rc-saida" placeholder="55"><span class="suffix">%</span></div>
               <div class="field field-inline"><label>Valor da arroba na venda</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-arroba-venda" placeholder="330,00"></div>
               <div class="field field-inline"><label>Taxa de abate</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-taxa-abate" placeholder="72,50"></div>
@@ -783,6 +784,8 @@ window.startNewSimulation = function(){
 
 function resetForm(){
   document.querySelectorAll('#sim-form input').forEach(i => i.value = '');
+  const el2 = document.getElementById('f-dias2-display');
+  if(el2) el2.textContent = '— dias';
 }
 
 // ===================== STEPS =====================
@@ -914,13 +917,20 @@ function calcDias2(){
   const pesoEntrada = val('f-peso-entrada');
   const gmd1 = val('f-gmd1');
   const dias1 = val('f-dias1');
-  const diasAdaptacao = val('f-dias-adaptacao');
-  const pesoSaida = val('f-peso-saida');
+  const el2 = document.getElementById('f-peso-saida-2');
+  const pesoSaida = el2 ? parseFloat(el2.value) || 0 : val('f-peso-saida');
   const gmd2 = val('f-gmd2');
   const pesoAposFase1 = pesoEntrada + gmd1 * dias1;
   if(gmd2 <= 0 || pesoSaida <= pesoAposFase1) return 0;
   return Math.round((pesoSaida - pesoAposFase1) / gmd2);
 }
+
+window.syncPesoSaida = function(el){
+  // sincroniza campo de saída (etapa 3) com o da etapa 2
+  const el2 = document.getElementById('f-peso-saida-2');
+  if(el2) el2.value = el.value;
+  window.updateDias2();
+};
 
 window.updateDias2 = function(){
   const dias2 = calcDias2();
@@ -946,7 +956,7 @@ function gatherFormData(){
     dias2: calcDias2(),
     valorDieta2: val('f-valor-dieta2'),
     consumo2: val('f-consumo2'),
-    pesoSaida: val('f-peso-saida'),
+    pesoSaida: (function(){ const el = document.getElementById('f-peso-saida-2'); return el && el.value ? parseFloat(el.value)||0 : val('f-peso-saida'); })(),
     rcSaida: val('f-rc-saida'),
     valorArrobaVenda: val('f-valor-arroba-venda'),
     taxaAbate: val('f-taxa-abate'),
@@ -1168,6 +1178,8 @@ window.duplicateFromResults = function(){
   document.getElementById('f-valor-dieta2').value = d.valorDieta2 || '';
   document.getElementById('f-consumo2').value = d.consumo2 || '';
   document.getElementById('f-peso-saida').value = d.pesoSaida || '';
+  const ps2 = document.getElementById('f-peso-saida-2');
+  if(ps2) ps2.value = d.pesoSaida || '';
   document.getElementById('f-rc-saida').value = d.rcSaida || '';
   document.getElementById('f-valor-arroba-venda').value = d.valorArrobaVenda || '';
   document.getElementById('f-taxa-abate').value = d.taxaAbate || '';

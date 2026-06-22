@@ -426,7 +426,7 @@
               </div>
             </div>
             <div class="grid2">
-              <div class="field"><label>Peso de entrada (kg)</label><input type="number" step="any" class="num-input" id="f-peso-entrada" placeholder="410"></div>
+              <div class="field"><label>Peso de entrada (kg)</label><input type="number" step="any" class="num-input" id="f-peso-entrada" placeholder="410" oninput="window.updateDias2()"></div>
               <div class="field field-inline"><label>Valor do kg de compra</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-kg-compra" placeholder="12,70"></div>
               <div class="field field-inline"><label>Frete</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-frete" placeholder="60,00"></div>
               <div class="field field-inline"><label>Protocolo sanitário de chegada</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-protocolo" placeholder="20,00"></div>
@@ -447,8 +447,8 @@
               </div>
             </div>
             <div class="grid3">
-              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd1" placeholder="1,100"><span class="suffix">kg/dia</span></div>
-              <div class="field"><label>Dias de trato</label><input type="number" step="any" class="num-input" id="f-dias1" placeholder="28"></div>
+              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd1" placeholder="1,100" oninput="window.updateDias2()"><span class="suffix">kg/dia</span></div>
+              <div class="field"><label>Dias de trato</label><input type="number" step="any" class="num-input" id="f-dias1" placeholder="28" oninput="window.updateDias2()"></div>
               <div class="field field-inline"><label>Valor do kg da dieta</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-dieta1" placeholder="1,13"></div>
               <div class="field field-inline" style="grid-column: 1 / -1;"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo1" placeholder="1,80"><span class="suffix">%</span></div>
             </div>
@@ -464,7 +464,7 @@
             </div>
             <div class="field">
               <label>Dias de adaptação</label>
-              <input type="number" step="any" class="num-input" id="f-dias-adaptacao" placeholder="0">
+              <input type="number" step="any" class="num-input" id="f-dias-adaptacao" placeholder="0" oninput="window.updateDias2()">
             </div>
           </div>
 
@@ -476,11 +476,14 @@
                 <div class="hint">Fase de terminação</div>
               </div>
             </div>
-            <div class="grid3">
-              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd2" placeholder="1,450"><span class="suffix">kg/dia</span></div>
-              <div class="field"><label>Dias de trato</label><input type="number" step="any" class="num-input" id="f-dias2" placeholder="75"></div>
+            <div class="grid2">
+              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd2" placeholder="1,450" oninput="window.updateDias2()"><span class="suffix">kg/dia</span></div>
+              <div class="field">
+                <label>Dias de trato <span style="color:var(--gold);font-size:11px;">(calculado automaticamente)</span></label>
+                <div id="f-dias2-display" style="background:var(--bg);border:1px solid var(--line-strong);padding:12px 14px;border-radius:var(--radius);font-family:'Roboto Mono';font-size:14.5px;color:var(--gold);">— dias</div>
+              </div>
               <div class="field field-inline"><label>Valor do kg da dieta</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-dieta2" placeholder="1,13"></div>
-              <div class="field field-inline" style="grid-column: 1 / -1;"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo2" placeholder="1,90"><span class="suffix">%</span></div>
+              <div class="field field-inline"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo2" placeholder="1,90"><span class="suffix">%</span></div>
             </div>
           </div>
         </div>
@@ -496,7 +499,7 @@
               </div>
             </div>
             <div class="grid2">
-              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida" placeholder="550"></div>
+              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida" placeholder="550" oninput="window.updateDias2()"></div>
               <div class="field field-inline"><label>RC de saída</label><input type="number" step="any" class="num-input" id="f-rc-saida" placeholder="55"><span class="suffix">%</span></div>
               <div class="field field-inline"><label>Valor da arroba na venda</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-arroba-venda" placeholder="330,00"></div>
               <div class="field field-inline"><label>Taxa de abate</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-taxa-abate" placeholder="72,50"></div>
@@ -517,7 +520,7 @@
               </div>
             </div>
             <div class="grid2">
-              <div class="field field-inline"><label>Valor financiado</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-financiado" placeholder="0,00"></div>
+              <div class="field field-inline"><label>% da operação financiada</label><input type="number" step="any" class="num-input" id="f-valor-financiado" placeholder="0" min="0" max="100"><span class="suffix">%</span></div>
               <div class="field field-inline"><label>Taxa de juros</label><input type="number" step="any" class="num-input" id="f-taxa-juros" placeholder="8,0"><span class="suffix">% a.a.</span></div>
             </div>
           </div>
@@ -833,9 +836,9 @@ function renderReview(){
     <div><strong style="color:var(--sand)">${escapeHtml(nome)}</strong></div>
     <div>Entrada: ${val('f-peso-entrada')} kg a R$ ${fmtNum(val('f-valor-kg-compra'))}/kg</div>
     <div>Dieta inicial: ${val('f-dias1')} dias · GMD ${fmtNum(val('f-gmd1'))} kg</div>
-    <div>Dieta final: ${val('f-dias2')} dias · GMD ${fmtNum(val('f-gmd2'))} kg</div>
+    <div>Dieta final: ${calcDias2()} dias · GMD ${fmtNum(val('f-gmd2'))} kg</div>
     <div>Saída: ${val('f-peso-saida')} kg vivo · @ a R$ ${fmtNum(val('f-valor-arroba-venda'))}</div>
-    <div>Financiamento: R$ ${fmtNum(val('f-valor-financiado'))} a ${fmtNum(val('f-taxa-juros'))}% a.a.</div>
+    <div>Financiamento: ${fmtNum(val('f-valor-financiado'))}% da operação a ${fmtNum(val('f-taxa-juros'))}% a.a.</div>
   `;
   document.getElementById('review-summary').innerHTML = html;
 }
@@ -876,8 +879,10 @@ function calculateOperation(d){
   const taxasVenda = d.taxaAbate + valorSenarFunrural + d.acompanhamento;
   const valorLiquidoVenda = valorBrutoVenda - taxasVenda;
 
-  // Financiamento
-  const jurosFinanciamento = d.valorFinanciado * (d.taxaJuros/100) * (diasTotais/365);
+  // Financiamento (valorFinanciado é % da operação)
+  const custoSemJuros = valorEntrada + custoNutricaoTotal + custoOperacional;
+  const valorFinanciadoReais = custoSemJuros * (d.pctFinanciado/100);
+  const jurosFinanciamento = valorFinanciadoReais * (d.taxaJuros/100) * (diasTotais/365);
 
   // Desempenho
   const ganhoPeso = d.pesoSaida - d.pesoEntrada;
@@ -898,11 +903,30 @@ function calculateOperation(d){
     custoDietaPeriodo1, custoDietaPeriodo2, custoNutricaoTotal,
     diasTotais, custoOperacional,
     pesoCarcacaSaida, carcacaSaidaArroba, valorBrutoVenda, taxasVenda, valorLiquidoVenda,
-    jurosFinanciamento,
+    valorFinanciadoReais, jurosFinanciamento,
     ganhoPeso, ganhoCarcaca, gmdOperacao, rendimentoGanho, producaoArroba, custoPorArroba,
     desembolsoTotal, lucroLiquido, rentabilidade, rentabilidadeMes
   };
 }
+
+// Calcula dias da fase final automaticamente
+function calcDias2(){
+  const pesoEntrada = val('f-peso-entrada');
+  const gmd1 = val('f-gmd1');
+  const dias1 = val('f-dias1');
+  const diasAdaptacao = val('f-dias-adaptacao');
+  const pesoSaida = val('f-peso-saida');
+  const gmd2 = val('f-gmd2');
+  const pesoAposFase1 = pesoEntrada + gmd1 * dias1;
+  if(gmd2 <= 0 || pesoSaida <= pesoAposFase1) return 0;
+  return Math.round((pesoSaida - pesoAposFase1) / gmd2);
+}
+
+window.updateDias2 = function(){
+  const dias2 = calcDias2();
+  const el = document.getElementById('f-dias2-display');
+  if(el) el.textContent = dias2 > 0 ? dias2 + ' dias' : '— dias';
+};
 
 function gatherFormData(){
   return {
@@ -919,7 +943,7 @@ function gatherFormData(){
     consumo1: val('f-consumo1'),
     diasAdaptacao: val('f-dias-adaptacao'),
     gmd2: val('f-gmd2'),
-    dias2: val('f-dias2'),
+    dias2: calcDias2(),
     valorDieta2: val('f-valor-dieta2'),
     consumo2: val('f-consumo2'),
     pesoSaida: val('f-peso-saida'),
@@ -928,7 +952,7 @@ function gatherFormData(){
     taxaAbate: val('f-taxa-abate'),
     senarFunrural: val('f-senar-funrural'),
     acompanhamento: val('f-acompanhamento'),
-    valorFinanciado: val('f-valor-financiado'),
+    pctFinanciado: val('f-valor-financiado'),
     taxaJuros: val('f-taxa-juros')
   };
 }

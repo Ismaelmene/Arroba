@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Arroba — Viabilidade de Engorda</title>
+<title>TipCerto — Viabilidade de Engorda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Roboto+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -297,7 +297,7 @@
   <div class="login-box">
     <div class="login-brand">
       <div class="mark">@</div>
-      <h1>Arroba</h1>
+      <h1>TipCerto</h1>
       <p>Calcule a viabilidade da sua operação de recria e engorda antes de fechar o negócio.</p>
     </div>
 
@@ -340,7 +340,7 @@
     <div class="brand">
       <div class="mark">@</div>
       <div>
-        <div class="word">Arroba</div>
+        <div class="word">TipCerto</div>
         <div class="tag">Viabilidade de engorda</div>
       </div>
     </div>
@@ -426,7 +426,7 @@
               </div>
             </div>
             <div class="grid2">
-              <div class="field"><label>Peso de entrada (kg)</label><input type="number" step="any" class="num-input" id="f-peso-entrada" placeholder="410" oninput="window.updateDias2()"></div>
+              <div class="field"><label>Peso de entrada (kg)</label><input type="number" step="any" class="num-input" id="f-peso-entrada" placeholder="410" oninput="window.updatePrevisao()"></div>
               <div class="field field-inline"><label>Valor do kg de compra</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-kg-compra" placeholder="12,70"></div>
               <div class="field field-inline"><label>Frete</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-frete" placeholder="60,00"></div>
               <div class="field field-inline"><label>Protocolo sanitário de chegada</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-protocolo" placeholder="20,00"></div>
@@ -447,26 +447,14 @@
               </div>
             </div>
             <div class="grid3">
-              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd1" placeholder="1,100" oninput="window.updateDias2()"><span class="suffix">kg/dia</span></div>
-              <div class="field"><label>Dias de trato</label><input type="number" step="any" class="num-input" id="f-dias1" placeholder="28" oninput="window.updateDias2()"></div>
+              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd1" placeholder="1,100" oninput="window.updatePrevisao()"><span class="suffix">kg/dia</span></div>
+              <div class="field"><label>Dias de trato</label><input type="number" step="any" class="num-input" id="f-dias1" placeholder="28" oninput="window.updatePrevisao()"></div>
               <div class="field field-inline"><label>Valor do kg da dieta</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-dieta1" placeholder="1,13"></div>
               <div class="field field-inline" style="grid-column: 1 / -1;"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo1" placeholder="1,80"><span class="suffix">%</span></div>
             </div>
           </div>
 
-          <div class="block">
-            <div class="block-head">
-              <div class="n">3</div>
-              <div>
-                <h3>Transição</h3>
-                <div class="hint">Dias de adaptação entre a dieta inicial e a final</div>
-              </div>
-            </div>
-            <div class="field">
-              <label>Dias de adaptação</label>
-              <input type="number" step="any" class="num-input" id="f-dias-adaptacao" placeholder="0" oninput="window.updateDias2()">
-            </div>
-          </div>
+
 
           <div class="block">
             <div class="block-head">
@@ -477,14 +465,26 @@
               </div>
             </div>
             <div class="grid2">
-              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida-2" placeholder="550" oninput="window.updateDias2()"></div>
-              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd2" placeholder="1,450" oninput="window.updateDias2()"><span class="suffix">kg/dia</span></div>
+              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida-2" placeholder="550" oninput="window.updatePrevisao()"></div>
+              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd2" placeholder="1,450" oninput="window.updatePrevisao()"><span class="suffix">kg/dia</span></div>
               <div class="field">
                 <label>Dias de trato <span style="color:var(--gold);font-size:11px;">(calculado automaticamente)</span></label>
                 <div id="f-dias2-display" style="background:var(--bg);border:1px solid var(--line-strong);padding:12px 14px;border-radius:var(--radius);font-family:'Roboto Mono';font-size:14.5px;color:var(--gold);">— dias</div>
               </div>
               <div class="field field-inline"><label>Valor do kg da dieta</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-dieta2" placeholder="1,13"></div>
               <div class="field field-inline"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo2" placeholder="1,90"><span class="suffix">%</span></div>
+            </div>
+          </div>
+          <div class="block" style="border-color:var(--gold);background:linear-gradient(135deg,rgba(212,162,76,0.08),transparent);">
+            <div class="block-head">
+              <div class="n" style="border-color:var(--gold);color:var(--gold);">📅</div>
+              <div>
+                <h3>Previsão de abate</h3>
+                <div class="hint">Calculado com base nos dados acima</div>
+              </div>
+            </div>
+            <div id="previsao-display" style="font-size:14px;">
+              <span style="color:var(--sand-dim)">Preencha os dados acima para ver a previsão</span>
             </div>
           </div>
         </div>
@@ -681,7 +681,7 @@ window.showSignup = function(){
 
 window.showLogin = function(){
   isSignupMode = false;
-  document.querySelector('#screen-login h1').textContent = 'Arroba';
+  document.querySelector('#screen-login h1').textContent = 'TipCerto';
   document.querySelector('#screen-login p').textContent = 'Calcule a viabilidade da sua operação de recria e engorda antes de fechar o negócio.';
   document.querySelector('#btn-login').innerHTML = '<i class="ti ti-login-2"></i> Entrar';
   document.querySelector('.login-switch').innerHTML = 'Ainda não tem conta? <a onclick="window.showSignup()">Criar conta</a>';
@@ -786,6 +786,8 @@ function resetForm(){
   document.querySelectorAll('#sim-form input').forEach(i => i.value = '');
   const el2 = document.getElementById('f-dias2-display');
   if(el2) el2.textContent = '— dias';
+  const prev = document.getElementById('previsao-display');
+  if(prev) prev.innerHTML = '<span style="color:var(--sand-dim)">Preencha os dados acima para ver a previsão</span>';
 }
 
 // ===================== STEPS =====================
@@ -811,6 +813,10 @@ function renderStep(){
 
 window.nextStep = function(){
   if(currentStep < TOTAL_STEPS){
+    // sincronizar peso de saída da etapa 2 → etapa 3
+    const ps2 = document.getElementById('f-peso-saida-2');
+    const ps3 = document.getElementById('f-peso-saida');
+    if(ps2 && ps3 && ps2.value) ps3.value = ps2.value;
     currentStep++;
     renderStep();
   } else {
@@ -925,6 +931,59 @@ function calcDias2(){
   return Math.round((pesoSaida - pesoAposFase1) / gmd2);
 }
 
+function calcDataAbate(){
+  const dataEntrada = document.getElementById('f-data-entrada');
+  if(!dataEntrada || !dataEntrada.value) return null;
+  const dias1 = val('f-dias1');
+  const dias2 = calcDias2();
+  const totalDias = dias1 + dias2;
+  const dt = new Date(dataEntrada.value + 'T12:00:00');
+  dt.setDate(dt.getDate() + totalDias);
+  return { data: dt, totalDias, dias2 };
+}
+
+window.updatePrevisao = function(){
+  window.updateDias2();
+  const res = calcDataAbate();
+  const el = document.getElementById('previsao-display');
+  if(!el) return;
+  if(!res || res.totalDias <= 0){
+    el.innerHTML = '<span style="color:var(--sand-dim)">Preencha os dados acima para ver a previsão</span>';
+    return;
+  }
+  const pesoEntrada = val('f-peso-entrada');
+  const el2 = document.getElementById('f-peso-saida-2');
+  const pesoSaida = el2 ? parseFloat(el2.value)||0 : val('f-peso-saida');
+  const gmd1 = val('f-gmd1');
+  const gmd2 = val('f-gmd2');
+  const dias1 = val('f-dias1');
+  const operacionalMes = val('f-operacional-mes');
+  const valorKgCompra = val('f-valor-kg-compra');
+  const frete = val('f-frete');
+  const protocolo = val('f-protocolo');
+  const consumo1 = val('f-consumo1');
+  const consumo2 = val('f-consumo2');
+  const valorDieta1 = val('f-valor-dieta1');
+  const valorDieta2 = val('f-valor-dieta2');
+
+  const pesoMedio1 = (pesoEntrada + (pesoEntrada + gmd1*dias1))/2;
+  const custoDieta1 = pesoMedio1*(consumo1/100)*dias1*valorDieta1;
+  const pesoAposFase1 = pesoEntrada + gmd1*dias1;
+  const pesoMedio2 = (pesoAposFase1 + pesoSaida)/2;
+  const custoDieta2 = pesoMedio2*(consumo2/100)*res.dias2*valorDieta2;
+  const custoAquisicao = pesoEntrada*valorKgCompra + frete + protocolo;
+  const custoOp = operacionalMes*(res.totalDias/30);
+  const custoTotal = custoAquisicao + custoDieta1 + custoDieta2 + custoOp;
+
+  const dtStr = res.data.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  el.innerHTML = \`
+    <div class="kv-row"><span class="k">Data prevista de abate</span><span class="v" style="color:var(--gold);font-size:16px;">\${dtStr}</span></div>
+    <div class="kv-row"><span class="k">Dias totais de operação</span><span class="v num">\${res.totalDias} dias</span></div>
+    <div class="kv-row"><span class="k">Peso estimado na saída</span><span class="v num">\${pesoSaida > 0 ? pesoSaida + ' kg' : '—'}</span></div>
+    <div class="kv-row total"><span class="k">Custo acumulado estimado</span><span class="v num" style="color:var(--terracotta);">\${custoTotal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>
+  \`;
+};
+
 window.syncPesoSaida = function(el){
   // sincroniza campo de saída (etapa 3) com o da etapa 2
   const el2 = document.getElementById('f-peso-saida-2');
@@ -951,7 +1010,7 @@ function gatherFormData(){
     dias1: val('f-dias1'),
     valorDieta1: val('f-valor-dieta1'),
     consumo1: val('f-consumo1'),
-    diasAdaptacao: val('f-dias-adaptacao'),
+    diasAdaptacao: 0,
     gmd2: val('f-gmd2'),
     dias2: calcDias2(),
     valorDieta2: val('f-valor-dieta2'),

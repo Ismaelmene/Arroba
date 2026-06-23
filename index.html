@@ -286,6 +286,47 @@
   @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
 
   input:focus-visible, button:focus-visible, a:focus-visible{ outline: 2px solid var(--gold); outline-offset:2px; }
+
+  /* ===== IMPRESSÃO / PDF ===== */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #fff !important; color: #1a1a1a !important; font-family: 'Inter', sans-serif; }
+    #boot-loader, #screen-login, #screen-dashboard, #screen-form,
+    .topbar, .results-actions, #btn-delete-sim, .thermo-wrap + * { display: none !important; }
+    #app, #screen-results { display: block !important; }
+    #screen-results { display: block !important; }
+    .screen { display: none !important; }
+    #screen-results { display: block !important; min-height: auto !important; }
+    .container { max-width: 100% !important; padding: 0 !important; }
+    .pdf-header { display: block !important; }
+    .verdict-banner { border: 2px solid #333 !important; background: #f5f5f5 !important; border-radius: 4px; padding: 16px 20px; margin-bottom: 16px; }
+    .verdict-banner.pos { background: #e8f5e9 !important; border-color: #4caf50 !important; }
+    .verdict-banner.neg { background: #fbe9e7 !important; border-color: #e64a19 !important; }
+    .verdict-value { font-size: 32px !important; }
+    .verdict-value.pos { color: #2e7d32 !important; }
+    .verdict-value.neg { color: #bf360c !important; }
+    .verdict-sub { color: #555 !important; }
+    .verdict-label { color: #555 !important; }
+    .thermo-wrap { display: block !important; }
+    .thermo-track { background: #eee !important; border: 1px solid #ccc !important; }
+    .thermo-fill { -webkit-print-color-adjust: exact !important; }
+    .results-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; margin-bottom: 12px !important; }
+    .result-block { background: #f9f9f9 !important; border: 1px solid #ddd !important; border-radius: 4px; padding: 14px 16px; break-inside: avoid; }
+    .result-block h4 { color: #7a5c1a !important; border-bottom: 1px solid #ddd !important; padding-bottom: 8px; margin-bottom: 10px; font-size: 12px; }
+    .kv-row { border-bottom: 1px solid #eee !important; padding: 5px 0 !important; font-size: 13px; }
+    .kv-row .k { color: #555 !important; }
+    .kv-row .v { color: #1a1a1a !important; font-weight: 600; }
+    .kv-row.total { border-top: 1.5px solid #ccc !important; }
+    #lote-block { background: #fffde7 !important; border: 1.5px solid #f9a825 !important; border-radius: 4px; padding: 14px 16px; margin-bottom: 12px; break-inside: avoid; }
+    #lote-block h4 { color: #7a5c1a !important; }
+    .pdf-dados { display: block !important; }
+    .pdf-dados-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 10px; margin-bottom: 12px; }
+    .pdf-dados-bloco { background: #f5f5f5 !important; border: 1px solid #ddd !important; border-radius: 4px; padding: 10px 12px; break-inside: avoid; }
+    .pdf-dados-bloco h5 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #777; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    .pdf-dados-bloco .prow { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+    .pdf-dados-bloco .prow:last-child { border-bottom: none; }
+    .pdf-dados-bloco .prow span:last-child { font-weight: 600; }
+  }
 </style>
 </head>
 <body>
@@ -579,6 +620,36 @@
         <button class="btn btn-ghost" onclick="window.goToDashboard()"><i class="ti ti-arrow-left"></i> Voltar</button>
       </div>
 
+      <!-- PDF HEADER -->
+      <div class="pdf-header" style="display:none; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #333;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:22px; font-weight:800; font-family:'Roboto Slab',serif;">TipCerto</div>
+            <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#777;">Relatório de Viabilidade de Engorda</div>
+          </div>
+          <div style="text-align:right; font-size:12px; color:#555;" id="pdf-data-geracao"></div>
+        </div>
+        <div style="margin-top:10px; font-size:16px; font-weight:700;" id="pdf-nome-sim"></div>
+      </div>
+
+      <!-- DADOS DA SIMULAÇÃO (só no PDF) -->
+      <div class="pdf-dados" style="display:none; margin-bottom:14px;">
+        <div class="pdf-dados-grid">
+          <div class="pdf-dados-bloco">
+            <h5>Entrada</h5>
+            <div id="pdf-dados-entrada"></div>
+          </div>
+          <div class="pdf-dados-bloco">
+            <h5>Dietas</h5>
+            <div id="pdf-dados-dietas"></div>
+          </div>
+          <div class="pdf-dados-bloco">
+            <h5>Saída / Venda</h5>
+            <div id="pdf-dados-saida"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="verdict-banner" id="verdict-banner">
         <div class="verdict-label" id="verdict-label">Resultado da operação</div>
         <div class="verdict-value" id="verdict-value">R$ 0,00</div>
@@ -637,14 +708,15 @@
       </div>
 
       <div class="result-block" id="lote-block" style="margin-bottom:20px; border-color:var(--gold);">
-        <h4 id="lote-title">Total do lote (— cabeças)</h4>
+        <h4 id="lote-title">Total do lote (— animais)</h4>
         <div class="kv-row"><span class="k">Desembolso total do lote</span><span class="v num" id="r-lote-desembolso">—</span></div>
         <div class="kv-row"><span class="k">Receita líquida do lote</span><span class="v num" id="r-lote-receita">—</span></div>
         <div class="kv-row total"><span class="k">Lucro / Prejuízo do lote</span><span class="v num" id="r-lote-lucro">—</span></div>
       </div>
 
       <div class="results-actions">
-        <button class="btn btn-primary" onclick="window.saveSimulation()"><i class="ti ti-device-floppy"></i> Salvar simulação</button>
+        <button class="btn btn-primary" onclick="window.saveSimulation()"><i class="ti ti-device-floppy"></i> Salvar</button>
+        <button class="btn btn-primary" onclick="window.saveAndPrint()" style="background:var(--gold);color:#1C1810;"><i class="ti ti-file-type-pdf"></i> Salvar e gerar relatório PDF</button>
         <button class="btn btn-ghost" onclick="window.duplicateFromResults()"><i class="ti ti-copy"></i> Duplicar e ajustar</button>
         <button class="btn btn-danger-outline" id="btn-delete-sim" style="display:none;" onclick="window.deleteCurrentSimulation()"><i class="ti ti-trash"></i> Excluir</button>
       </div>
@@ -866,7 +938,7 @@ function renderReview(){
   const nome = txt('f-nome') || '(sem nome)';
   const html = `
     <div><strong style="color:var(--sand)">${escapeHtml(nome)}</strong></div>
-    <div>Lote: ${val('f-qtd-animais') || 1} animal(is)</div>
+    <div>Lote: ${val('f-qtd-animais') || 1} animais</div>
     <div>Entrada: ${val('f-peso-entrada')} kg a R$ ${fmtNum(val('f-valor-kg-compra'))}/kg</div>
     <div>Dieta inicial: ${val('f-dias1')} dias · GMD ${fmtNum(val('f-gmd1'))} kg</div>
     <div>Dieta final: ${calcDias2()} dias · GMD ${fmtNum(val('f-gmd2'))} kg</div>
@@ -1155,7 +1227,7 @@ function renderResults(d, r){
 
   // Totais do lote
   const qtd = r.qtd || 1;
-  document.getElementById('lote-title').textContent = `Total do lote (${qtd} cabeça${qtd > 1 ? 's' : ''})`;
+  document.getElementById('lote-title').textContent = `Total do lote (${qtd} animais)`;
   document.getElementById('r-lote-desembolso').textContent = fmtBRL(r.loteDesembolso || r.desembolsoTotal * qtd);
   document.getElementById('r-lote-receita').textContent = fmtBRL(r.loteReceita || r.valorLiquidoVenda * qtd);
   const loteLucroEl = document.getElementById('r-lote-lucro');
@@ -1240,6 +1312,62 @@ window.openSimulation = function(id){
   renderResults(sim.input, sim.result);
   document.getElementById('btn-delete-sim').style.display = 'inline-flex';
   setScreen('screen-results');
+};
+
+window.saveAndPrint = async function(){
+  await window.saveSimulation();
+  window.printRelatorio();
+};
+
+window.printRelatorio = function(){
+  if(!lastCalcInput || !lastCalcResult) return;
+  const d = lastCalcInput;
+  const r = lastCalcResult;
+
+  // Preencher header PDF
+  document.getElementById('pdf-nome-sim').textContent = d.nome || 'Simulação';
+  document.getElementById('pdf-data-geracao').innerHTML =
+    'Gerado em: ' + new Date().toLocaleDateString('pt-BR') + '<br>' + d.qtdAnimais + ' animais';
+
+  // Dados de entrada
+  document.getElementById('pdf-dados-entrada').innerHTML = [
+    ['Peso de entrada', d.pesoEntrada + ' kg'],
+    ['Valor do kg', fmtBRL(d.valorKgCompra)],
+    ['Frete', fmtBRL(d.frete)],
+    ['Protocolo sanitário', fmtBRL(d.protocolo)],
+    ['RC na chegada', d.rcEntrada + '%'],
+    ['Operacional/cab/mês', fmtBRL(d.operacionalMes)],
+  ].map(([k,v]) => `<div class="prow"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Dados dietas
+  document.getElementById('pdf-dados-dietas').innerHTML = [
+    ['GMD fase inicial', d.gmd1 + ' kg/dia'],
+    ['Dias fase inicial', d.dias1 + ' dias'],
+    ['Custo kg dieta 1', fmtBRL(d.valorDieta1)],
+    ['CMS fase 1', d.consumo1 + '%'],
+    ['GMD fase final', d.gmd2 + ' kg/dia'],
+    ['Dias fase final', r.diasTotais - d.dias1 + ' dias'],
+    ['Custo kg dieta 2', fmtBRL(d.valorDieta2)],
+    ['CMS fase 2', d.consumo2 + '%'],
+  ].map(([k,v]) => `<div class="prow"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Dados saída
+  document.getElementById('pdf-dados-saida').innerHTML = [
+    ['Peso vivo de saída', d.pesoSaida + ' kg'],
+    ['RC de saída', d.rcSaida + '%'],
+    ['Valor da @', fmtBRL(d.valorArrobaVenda)],
+    ['Taxa de abate', fmtBRL(d.taxaAbate)],
+    ['Senar + Funrural', d.senarFunrural + '%'],
+    ['Financiado', d.pctFinanciado + '% a ' + d.taxaJuros + '% a.a.'],
+  ].map(([k,v]) => `<div class="prow"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Mostrar elementos PDF
+  document.querySelectorAll('.pdf-header, .pdf-dados').forEach(el => el.style.display = 'block');
+  window.print();
+  // Esconder após imprimir
+  setTimeout(() => {
+    document.querySelectorAll('.pdf-header, .pdf-dados').forEach(el => el.style.display = 'none');
+  }, 1000);
 };
 
 window.saveSimulation = async function(){

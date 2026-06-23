@@ -514,6 +514,27 @@
               <div class="field field-inline"><label>Acompanhamento de abate</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-acompanhamento" placeholder="3,75"></div>
             </div>
           </div>
+
+          <!-- Previsão de data de abate -->
+          <div class="block" style="border-color:var(--gold); background:linear-gradient(135deg,rgba(212,162,76,0.08),transparent);">
+            <div class="block-head">
+              <div class="n" style="border-color:var(--gold);color:var(--gold);">📅</div>
+              <div>
+                <h3>Previsão de abate</h3>
+                <div class="hint">Informe a data de entrada e o sistema calcula quando o lote estará pronto</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>Data de entrada do rebanho</label>
+                <input type="date" class="num-input" id="f-data-entrada" oninput="window.updateDataAbate()">
+              </div>
+              <div class="field">
+                <label>Data prevista de abate <span style="color:var(--gold);font-size:11px;">(calculada)</span></label>
+                <div id="data-abate-display" style="background:var(--bg);border:1px solid var(--line-strong);padding:12px 14px;border-radius:var(--radius);font-family:'Roboto Mono';font-size:14px;color:var(--gold);">— preencha a data de entrada</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Financiamento -->
@@ -963,6 +984,27 @@ function calcDataAbate(){
   dt.setDate(dt.getDate() + totalDias);
   return { data: dt, totalDias, dias2 };
 }
+
+window.updateDataAbate = function(){
+  const dataEntradaEl = document.getElementById('f-data-entrada');
+  const display = document.getElementById('data-abate-display');
+  if(!display) return;
+  if(!dataEntradaEl || !dataEntradaEl.value){
+    display.textContent = '— preencha a data de entrada';
+    return;
+  }
+  const dias1 = val('f-dias1');
+  const dias2 = calcDias2();
+  const totalDias = dias1 + dias2;
+  if(totalDias <= 0){
+    display.textContent = '— preencha os dados das dietas';
+    return;
+  }
+  const dt = new Date(dataEntradaEl.value + 'T12:00:00');
+  dt.setDate(dt.getDate() + totalDias);
+  const dtStr = dt.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  display.textContent = dtStr + ' (' + totalDias + ' dias)';
+};
 
 window.updatePrevisao = function(){
   window.updateDias2();

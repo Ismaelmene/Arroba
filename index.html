@@ -542,7 +542,7 @@
         </div>
 
         <div class="form-nav">
-          <button type="button" class="btn btn-ghost" id="btn-prev" onclick="window.prevStep()" style="visibility:hidden;">
+          <button type="button" class="btn btn-ghost" id="btn-prev" onclick="window.prevStep()" style="display:none;">
             <i class="ti ti-arrow-left"></i> Voltar
           </button>
           <button type="button" class="btn btn-primary" id="btn-next" onclick="window.nextStep()">
@@ -619,6 +619,13 @@
           <div class="kv-row"><span class="k">Rentabilidade da operação</span><span class="v num" id="r-rentabilidade">—</span></div>
           <div class="kv-row"><span class="k">Rentabilidade ao mês</span><span class="v num" id="r-rentabilidade-mes">—</span></div>
         </div>
+      </div>
+
+      <div class="result-block" id="lote-block" style="margin-bottom:20px; border-color:var(--gold);">
+        <h4 id="lote-title">Total do lote (— cabeças)</h4>
+        <div class="kv-row"><span class="k">Desembolso total do lote</span><span class="v num" id="r-lote-desembolso">—</span></div>
+        <div class="kv-row"><span class="k">Receita líquida do lote</span><span class="v num" id="r-lote-receita">—</span></div>
+        <div class="kv-row total"><span class="k">Lucro / Prejuízo do lote</span><span class="v num" id="r-lote-lucro">—</span></div>
       </div>
 
       <div class="results-actions">
@@ -800,7 +807,8 @@ function renderStep(){
     el.classList.toggle('done', n < currentStep);
     el.classList.toggle('active', n === currentStep);
   });
-  document.getElementById('btn-prev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+  const btnPrev = document.getElementById('btn-prev');
+  btnPrev.style.display = currentStep === 1 ? 'none' : 'inline-flex';
   document.getElementById('btn-next').innerHTML = currentStep === TOTAL_STEPS
     ? '<i class="ti ti-calculator"></i> Calcular resultado'
     : 'Continuar <i class="ti ti-arrow-right"></i>';
@@ -843,6 +851,7 @@ function renderReview(){
   const nome = txt('f-nome') || '(sem nome)';
   const html = `
     <div><strong style="color:var(--sand)">${escapeHtml(nome)}</strong></div>
+    <div>Lote: ${val('f-qtd-animais') || 1} animal(is)</div>
     <div>Entrada: ${val('f-peso-entrada')} kg a R$ ${fmtNum(val('f-valor-kg-compra'))}/kg</div>
     <div>Dieta inicial: ${val('f-dias1')} dias · GMD ${fmtNum(val('f-gmd1'))} kg</div>
     <div>Dieta final: ${calcDias2()} dias · GMD ${fmtNum(val('f-gmd2'))} kg</div>
@@ -907,6 +916,12 @@ function calculateOperation(d){
   const rentabilidade = desembolsoTotal > 0 ? (lucroLiquido / desembolsoTotal) * 100 : 0;
   const rentabilidadeMes = diasTotais > 0 ? rentabilidade / (diasTotais/30) : 0;
 
+  // Totais do lote
+  const qtd = d.qtdAnimais || 1;
+  const loteDesembolso = desembolsoTotal * qtd;
+  const loteLucro = lucroLiquido * qtd;
+  const loteReceita = valorLiquidoVenda * qtd;
+
   return {
     pesoCarcacaEntrada, valorEntrada,
     custoDietaPeriodo1, custoDietaPeriodo2, custoNutricaoTotal,
@@ -914,7 +929,8 @@ function calculateOperation(d){
     pesoCarcacaSaida, carcacaSaidaArroba, valorBrutoVenda, taxasVenda, valorLiquidoVenda,
     valorFinanciadoReais, jurosFinanciamento,
     ganhoPeso, ganhoCarcaca, gmdOperacao, rendimentoGanho, producaoArroba, custoPorArroba,
-    desembolsoTotal, lucroLiquido, rentabilidade, rentabilidadeMes
+    desembolsoTotal, lucroLiquido, rentabilidade, rentabilidadeMes,
+    qtd, loteDesembolso, loteLucro, loteReceita
   };
 }
 
@@ -997,6 +1013,9 @@ window.updateDias2 = function(){
   if(el) el.textContent = dias2 > 0 ? dias2 + ' dias' : '— dias';
 };
 
+// updatePrevisao chama updateDias2 internamente
+
+
 function gatherFormData(){
   return {
     nome: txt('f-nome') || 'Simulação sem nome',
@@ -1022,6 +1041,7 @@ function gatherFormData(){
     senarFunrural: val('f-senar-funrural'),
     acompanhamento: val('f-acompanhamento'),
     pctFinanciado: val('f-valor-financiado'),
+    qtdAnimais: Math.max(1, val('f-qtd-animais') || 1),
     taxaJuros: val('f-taxa-juros')
   };
 }
@@ -1096,6 +1116,16 @@ function renderResults(d, r){
   lucroEl.style.color = isPositive ? 'var(--green)' : 'var(--terracotta)';
   document.getElementById('r-rentabilidade').textContent = fmtNum(r.rentabilidade) + '%';
   document.getElementById('r-rentabilidade-mes').textContent = fmtNum(r.rentabilidadeMes) + '%';
+
+  // Totais do lote
+  const qtd = r.qtd || 1;
+  document.getElementById('lote-title').textContent = `Total do lote (${qtd} cabeça${qtd > 1 ? 's' : ''})`;
+  document.getElementById('r-lote-desembolso').textContent = fmtBRL(r.loteDesembolso || r.desembolsoTotal * qtd);
+  document.getElementById('r-lote-receita').textContent = fmtBRL(r.loteReceita || r.valorLiquidoVenda * qtd);
+  const loteLucroEl = document.getElementById('r-lote-lucro');
+  const loteLucro = r.loteLucro || r.lucroLiquido * qtd;
+  loteLucroEl.textContent = fmtBRL(loteLucro);
+  loteLucroEl.style.color = loteLucro >= 0 ? 'var(--green)' : 'var(--terracotta)';
 }
 
 // ===================== PERSISTENCE (Firestore) =====================
@@ -1224,6 +1254,7 @@ window.duplicateFromResults = function(){
   document.getElementById('f-peso-entrada').value = d.pesoEntrada || '';
   document.getElementById('f-valor-kg-compra').value = d.valorKgCompra || '';
   document.getElementById('f-frete').value = d.frete || '';
+  document.getElementById('f-qtd-animais').value = d.qtdAnimais || '';
   document.getElementById('f-protocolo').value = d.protocolo || '';
   document.getElementById('f-rc-entrada').value = d.rcEntrada || '';
   document.getElementById('f-operacional-mes').value = d.operacionalMes || '';

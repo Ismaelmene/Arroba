@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TipCerto — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root{
+    --bg:#1C1810;--panel:#252019;--panel-2:#2E281E;--line:#3A3324;--line-strong:#4A4230;
+    --sand:#E8DFC8;--sand-dim:#B8AD92;--green:#7C9468;--green-dim:#5C7049;
+    --terracotta:#B8633D;--gold:#D4A24C;--radius:2px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--sand);font-family:'Inter',sans-serif;min-height:100vh;}
+  .num{font-family:'Roboto Mono',monospace;}
+  h1,h2,h3{font-family:'Roboto Slab',serif;}
+  .spin{animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* Login */
+  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
+  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:36px;max-width:380px;width:100%;position:relative;}
+  .login-box::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;height:4px;background:linear-gradient(90deg,var(--terracotta),var(--gold),var(--green));}
+
+  /* Layout */
+  #admin-screen{display:none;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:2px solid var(--line);background:rgba(46,40,30,0.6);}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{width:32px;height:32px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:800;font-size:14px;}
+  .container{max-width:1200px;margin:0 auto;padding:28px 24px;}
+
+  /* Cards de métricas */
+  .metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
+  .metric-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--sand-dim);margin-bottom:8px;}
+  .metric-card .value{font-size:28px;font-weight:700;font-family:'Roboto Mono';}
+  .metric-card .value.green{color:var(--green);}
+  .metric-card .value.gold{color:var(--gold);}
+  .metric-card .value.terra{color:var(--terracotta);}
+
+  /* Tabela */
+  .table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .table-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);}
+  .table-head h3{font-size:16px;}
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--sand-dim);padding:12px 16px;border-bottom:1px solid var(--line);font-weight:600;}
+  td{padding:14px 16px;border-bottom:1px solid rgba(58,51,36,0.4);font-size:13.5px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(46,40,30,0.4);}
+
+  /* Status badges */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .badge.ativo{background:rgba(124,148,104,0.2);color:var(--green);border:1px solid var(--green-dim);}
+  .badge.trial{background:rgba(212,162,76,0.15);color:var(--gold);border:1px solid rgba(212,162,76,0.3);}
+  .badge.expirado{background:rgba(184,99,61,0.15);color:var(--terracotta);border:1px solid rgba(184,99,61,0.3);}
+
+  /* Botões */
+  .btn{font-family:'Inter';font-weight:600;font-size:13px;padding:8px 16px;border-radius:var(--radius);border:1.5px solid transparent;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+  .btn-primary{background:var(--green);color:#16190F;}
+  .btn-ghost{background:transparent;border-color:var(--line-strong);color:var(--sand);}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+  .btn-sm{padding:5px 10px;font-size:12px;}
+  .btn-gold{background:var(--gold);color:#1C1810;}
+
+  /* Campo */
+  .field label{display:block;font-size:12px;color:var(--sand-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600;}
+  .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line-strong);color:var(--sand);padding:10px 12px;border-radius:var(--radius);font-family:'Inter';font-size:14px;outline:none;}
+  .field input:focus{border-color:var(--gold);}
+  .field{margin-bottom:14px;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:24px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius);padding:28px;max-width:400px;width:100%;position:relative;}
+  .modal::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;height:3px;background:linear-gradient(90deg,var(--terracotta),var(--gold),var(--green));}
+
+  /* Toast */
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-2);border:1px solid var(--line-strong);color:var(--sand);padding:12px 20px;border-radius:var(--radius);font-size:14px;z-index:999;transition:transform .25s;display:flex;align-items:center;gap:8px;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+
+  #boot-loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;}
+</style>
+</head>
+<body>
+
+<div id="boot-loader"><i class="ti ti-loader-2 spin" style="font-size:28px;color:var(--gold);"></i></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="width:48px;height:48px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--gold);font-weight:800;font-size:20px;">@</div>
+      <h2 style="font-size:20px;">TipCerto Admin</h2>
+      <p style="color:var(--sand-dim);font-size:13px;margin-top:4px;">Acesso restrito</p>
+    </div>
+    <div id="login-error" style="display:none;background:rgba(184,99,61,0.15);border:1px solid #8C4A2C;color:#E2A788;padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;"></div>
+    <div class="field"><label>E-mail</label><input type="email" id="login-email"></div>
+    <div class="field"><label>Senha</label><input type="password" id="login-password"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="window.doLogin()">
+      <i class="ti ti-login-2"></i> Entrar
+    </button>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="admin-screen">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">@</div>
+      <div>
+        <div style="font-size:16px;font-weight:700;">TipCerto Admin</div>
+        <div style="font-size:11px;color:var(--sand-dim);letter-spacing:1px;text-transform:uppercase;">Painel de controle</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <button class="btn btn-ghost btn-sm" onclick="window.loadUsers()"><i class="ti ti-refresh"></i> Atualizar</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.doLogout()"><i class="ti ti-logout"></i> Sair</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Métricas -->
+    <div class="metrics">
+      <div class="metric-card">
+        <div class="label">Total de usuários</div>
+        <div class="value gold" id="m-total">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Assinaturas ativas</div>
+        <div class="value green" id="m-ativos">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Em trial</div>
+        <div class="value" id="m-trial">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Expirados</div>
+        <div class="value terra" id="m-expirados">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Receita estimada/ano</div>
+        <div class="value gold num" id="m-receita">—</div>
+      </div>
+    </div>
+
+    <!-- Filtro e busca -->
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <input type="text" id="search-input" placeholder="Buscar por e-mail..." oninput="window.filterUsers()" style="background:var(--panel);border:1px solid var(--line-strong);color:var(--sand);padding:10px 14px;border-radius:var(--radius);font-family:'Inter';font-size:14px;outline:none;flex:1;min-width:200px;">
+      <select id="filter-status" onchange="window.filterUsers()" style="background:var(--panel);border:1px solid var(--line-strong);color:var(--sand);padding:10px 14px;border-radius:var(--radius);font-family:'Inter';font-size:14px;outline:none;">
+        <option value="">Todos os status</option>
+        <option value="ativo">Ativo</option>
+        <option value="trial">Trial</option>
+        <option value="expirado">Expirado</option>
+      </select>
+    </div>
+
+    <!-- Tabela -->
+    <div class="table-wrap">
+      <div class="table-head">
+        <h3>Usuários</h3>
+        <span id="user-count" style="font-size:13px;color:var(--sand-dim);">—</span>
+      </div>
+      <div id="table-loading" style="padding:40px;text-align:center;color:var(--sand-dim);">
+        <i class="ti ti-loader-2 spin" style="font-size:22px;"></i>
+      </div>
+      <div id="table-container" style="display:none;overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>E-mail</th>
+              <th>Status</th>
+              <th>Simulações</th>
+              <th>Cadastro</th>
+              <th>Expira em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+      <div id="table-empty" style="display:none;padding:40px;text-align:center;color:var(--sand-dim);">
+        Nenhum usuário encontrado.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR USUÁRIO -->
+<div class="modal-overlay" id="modal-user">
+  <div class="modal">
+    <h3 style="margin-bottom:6px;">Editar usuário</h3>
+    <div id="modal-email" style="color:var(--sand-dim);font-size:13px;margin-bottom:20px;"></div>
+    <div class="field">
+      <label>Status</label>
+      <select id="modal-status">
+        <option value="trial">Trial</option>
+        <option value="ativo">Ativo</option>
+        <option value="expirado">Expirado</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Simulações grátis (trial)</label>
+      <input type="number" id="modal-sims-gratis" min="0" max="50">
+    </div>
+    <div class="field">
+      <label>Assinatura expira em</label>
+      <input type="date" id="modal-expira">
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-primary" onclick="window.salvarUsuario()"><i class="ti ti-check"></i> Salvar</button>
+      <button class="btn btn-ghost" onclick="window.fecharModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><i class="ti ti-circle-check" style="color:var(--green);"></i><span id="toast-msg"></span></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, getDocs, doc, updateDoc,
+  query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const ADMIN_EMAIL = 'agrosafra7@gmail.com';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAiQht_3b8YxHE1y24MwhWEdSebftqIwGU",
+  authDomain: "arroba-db4a9.firebaseapp.com",
+  projectId: "arroba-db4a9",
+  storageBucket: "arroba-db4a9.firebasestorage.app",
+  messagingSenderId: "480151784908",
+  appId: "1:480151784908:web:40afbb873a15c5a5ab2169"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let allUsers = [];
+let editingDocId = null;
+
+// ===== AUTH =====
+window.doLogin = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if(email !== ADMIN_EMAIL){
+    errEl.textContent = 'Acesso negado.';
+    errEl.style.display = 'block';
+    return;
+  }
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch(e) {
+    errEl.textContent = 'E-mail ou senha incorretos.';
+    errEl.style.display = 'block';
+  }
+};
+
+window.doLogout = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+  document.getElementById('boot-loader').style.display = 'none';
+  if(user && user.email === ADMIN_EMAIL){
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    await window.loadUsers();
+  } else {
+    if(user) await signOut(auth);
+    document.getElementById('admin-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+});
+
+// ===== CARREGAR USUÁRIOS =====
+window.loadUsers = async function(){
+  document.getElementById('table-loading').style.display = 'block';
+  document.getElementById('table-container').style.display = 'none';
+  document.getElementById('table-empty').style.display = 'none';
+
+  try {
+    const snap = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
+    allUsers = [];
+    snap.forEach(d => allUsers.push({ docId: d.id, ...d.data() }));
+    updateMetrics();
+    renderTable(allUsers);
+  } catch(e) {
+    console.error(e);
+    showToast('Erro ao carregar usuários.', true);
+  } finally {
+    document.getElementById('table-loading').style.display = 'none';
+  }
+};
+
+function updateMetrics(){
+  const total = allUsers.length;
+  const agora = new Date();
+  const ativos = allUsers.filter(u => {
+    if(u.status !== 'ativo') return false;
+    if(!u.assinaturaExpira) return false;
+    const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
+    return exp > agora;
+  }).length;
+  const trial = allUsers.filter(u => u.status === 'trial').length;
+  const expirados = allUsers.filter(u => {
+    if(u.status === 'expirado') return true;
+    if(u.status === 'ativo' && u.assinaturaExpira){
+      const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
+      return exp <= agora;
+    }
+    return false;
+  }).length;
+
+  document.getElementById('m-total').textContent = total;
+  document.getElementById('m-ativos').textContent = ativos;
+  document.getElementById('m-trial').textContent = trial;
+  document.getElementById('m-expirados').textContent = expirados;
+  document.getElementById('m-receita').textContent = (ativos * 115).toLocaleString('pt-BR', {style:'currency',currency:'BRL'});
+}
+
+function renderTable(users){
+  if(users.length === 0){
+    document.getElementById('table-empty').style.display = 'block';
+    document.getElementById('table-container').style.display = 'none';
+    document.getElementById('user-count').textContent = '0 usuários';
+    return;
+  }
+
+  document.getElementById('table-container').style.display = 'block';
+  document.getElementById('table-empty').style.display = 'none';
+  document.getElementById('user-count').textContent = `${users.length} usuário${users.length !== 1 ? 's' : ''}`;
+
+  const agora = new Date();
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = users.map(u => {
+    const criado = u.createdAt && u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—';
+    let expiraStr = '—';
+    let statusReal = u.status || 'trial';
+    if(u.assinaturaExpira){
+      const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
+      expiraStr = exp.toLocaleDateString('pt-BR');
+      if(u.status === 'ativo' && exp <= agora) statusReal = 'expirado';
+    }
+    const simsUsadas = u.simsUsadas || 0;
+    const simsGratis = u.simsGratis || 2;
+    const badge = statusReal === 'ativo'
+      ? '<span class="badge ativo"><i class="ti ti-check"></i> Ativo</span>'
+      : statusReal === 'trial'
+      ? `<span class="badge trial"><i class="ti ti-clock"></i> Trial (${simsUsadas}/${simsGratis})</span>`
+      : '<span class="badge expirado"><i class="ti ti-x"></i> Expirado</span>';
+
+    return `<tr>
+      <td style="font-family:'Roboto Mono';font-size:13px;">${u.email || '—'}</td>
+      <td>${badge}</td>
+      <td class="num">${simsUsadas}</td>
+      <td>${criado}</td>
+      <td>${expiraStr}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="window.abrirModal('${u.docId}')">
+          <i class="ti ti-edit"></i> Editar
+        </button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+window.filterUsers = function(){
+  const search = document.getElementById('search-input').value.toLowerCase();
+  const status = document.getElementById('filter-status').value;
+  const filtered = allUsers.filter(u => {
+    const matchEmail = !search || (u.email || '').toLowerCase().includes(search);
+    const matchStatus = !status || (u.status || 'trial') === status;
+    return matchEmail && matchStatus;
+  });
+  renderTable(filtered);
+};
+
+// ===== MODAL =====
+window.abrirModal = function(docId){
+  const u = allUsers.find(x => x.docId === docId);
+  if(!u) return;
+  editingDocId = docId;
+  document.getElementById('modal-email').textContent = u.email || '—';
+  document.getElementById('modal-status').value = u.status || 'trial';
+  document.getElementById('modal-sims-gratis').value = u.simsGratis || 2;
+  if(u.assinaturaExpira){
+    const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
+    document.getElementById('modal-expira').value = exp.toISOString().split('T')[0];
+  } else {
+    document.getElementById('modal-expira').value = '';
+  }
+  document.getElementById('modal-user').classList.add('open');
+};
+
+window.fecharModal = function(){
+  document.getElementById('modal-user').classList.remove('open');
+  editingDocId = null;
+};
+
+window.salvarUsuario = async function(){
+  if(!editingDocId) return;
+  const status = document.getElementById('modal-status').value;
+  const simsGratis = parseInt(document.getElementById('modal-sims-gratis').value) || 2;
+  const expiraVal = document.getElementById('modal-expira').value;
+
+  const update = { status, simsGratis };
+  if(expiraVal){
+    update.assinaturaExpira = new Date(expiraVal + 'T23:59:59');
+  }
+
+  try {
+    await updateDoc(doc(db, 'users', editingDocId), update);
+    showToast('Usuário atualizado!');
+    fecharModal();
+    await window.loadUsers();
+  } catch(e) {
+    showToast('Erro ao salvar.', true);
+  }
+};
+
+// ===== TOAST =====
+let toastTimeout;
+function showToast(msg, isError=false){
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.querySelector('i').style.color = isError ? 'var(--terracotta)' : 'var(--green)';
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 3000);
+}
+window.showToast = showToast;
+</script>
+</body>
+</html>

@@ -383,6 +383,37 @@
 </div>
 
 <!-- ===================== MAIN APP ===================== -->
+<!-- ===================== PAYWALL ===================== -->
+<div id="screen-paywall" style="display:none; min-height:100vh; background:var(--bg); align-items:center; justify-content:center; padding:24px;">
+  <div style="max-width:440px; width:100%; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:40px 36px; position:relative;">
+    <div style="position:absolute;top:-2px;left:-2px;right:-2px;height:4px;background:linear-gradient(90deg,var(--terracotta),var(--gold),var(--green));"></div>
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="width:56px;height:56px;border:2.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--gold);font-size:24px;font-weight:800;">@</div>
+      <h2 style="font-family:Roboto Slab,serif;font-size:22px;margin-bottom:8px;">Suas simulacoes gratuitas acabaram</h2>
+      <p style="color:var(--sand-dim);font-size:14px;line-height:1.6;">Voce usou suas 2 simulacoes gratis. Assine o TipCerto para simulacoes ilimitadas.</p>
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+      <div style="font-size:36px;font-weight:800;font-family:Roboto Slab,serif;color:var(--gold);">R$ 115<span style="font-size:16px;color:var(--sand-dim);font-weight:400;">/ano</span></div>
+      <div style="font-size:12px;color:var(--sand-dim);margin-top:4px;">aproximadamente R$ 9,58/mes</div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--sand-dim);">
+        <div>Simulacoes ilimitadas</div>
+        <div>Historico completo salvo</div>
+        <div>Relatorio PDF</div>
+        <div>Previsao de data de abate</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-assinar" onclick="window.iniciarPagamento()">
+      <i class="ti ti-credit-card"></i> Assinar agora — R$ 115,00/ano
+    </button>
+    <div id="paywall-loading" style="display:none;text-align:center;margin-top:12px;color:var(--sand-dim);font-size:13px;">
+      <i class="ti ti-loader-2 spin"></i> Gerando link de pagamento...
+    </div>
+    <div style="text-align:center;margin-top:16px;">
+      <button class="btn btn-ghost" onclick="window.handleLogout()" style="font-size:13px;padding:8px 16px;">Sair da conta</button>
+    </div>
+  </div>
+</div>
+
 <div id="app">
   <div class="topbar">
     <div class="brand">
@@ -845,19 +876,95 @@ window.handleLogout = async function(){
   await signOut(auth);
 };
 
+async function checkAccess(user){
+  try {
+    const q = query(collection(db, 'users'), where('uid', '==', user.uid));
+    const snap = await getDocs(q);
+    if(snap.empty){
+      await addDoc(collection(db, 'users'), {
+        uid: user.uid, email: user.email,
+        createdAt: serverTimestamp(), status: 'trial',
+        simsUsadas: 0, simsGratis: 2, assinaturaExpira: null
+      });
+      return { allowed: true, status: 'trial' };
+    }
+    let userData = null;
+    snap.forEach(d => userData = {...d.data(), docId: d.id});
+
+    if(userData.status === 'ativo' && userData.assinaturaExpira){
+      const expira = userData.assinaturaExpira.toDate ? userData.assinaturaExpira.toDate() : new Date(userData.assinaturaExpira);
+      if(expira > new Date()) return { allowed: true, status: 'ativo' };
+      return { allowed: false, status: 'expirado' };
+    }
+    const simsGratis = userData.simsGratis || 2;
+    const simsUsadas = userData.simsUsadas || 0;
+    if(simsUsadas < simsGratis) return { allowed: true, status: 'trial', simsRestantes: simsGratis - simsUsadas };
+    return { allowed: false, status: 'trial_expirado' };
+  } catch(e) {
+    console.error('checkAccess error:', e);
+    return { allowed: true, status: 'trial' };
+  }
+}
+
+async function incrementSimsUsadas(){
+  if(!currentUser) return;
+  try {
+    const { updateDoc, increment: firestoreIncrement } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+    const snap = await getDocs(q);
+    snap.forEach(async d => {
+      await updateDoc(doc(db, 'users', d.id), { simsUsadas: firestoreIncrement(1) });
+    });
+  } catch(e) { console.error(e); }
+}
+
+window.iniciarPagamento = async function(){
+  if(!currentUser) return;
+  const btn = document.getElementById('btn-assinar');
+  const loading = document.getElementById('paywall-loading');
+  btn.disabled = true;
+  loading.style.display = 'block';
+  try {
+    const resp = await fetch('/api/mp-checkout', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ userId: currentUser.uid, email: currentUser.email })
+    });
+    const data = await resp.json();
+    if(data.checkoutUrl){
+      window.open(data.checkoutUrl, '_blank');
+    } else {
+      showToast('Erro ao gerar link. Tente novamente.', true);
+    }
+  } catch(e) {
+    showToast('Erro ao conectar com servidor.', true);
+  } finally {
+    btn.disabled = false;
+    loading.style.display = 'none';
+  }
+};
+
 onAuthStateChanged(auth, async (user) => {
   document.getElementById('boot-loader').style.display = 'none';
   if(user){
     currentUser = user;
     document.getElementById('screen-login').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.getElementById('user-email-pill').textContent = user.email || 'Usuário';
+    document.getElementById('user-email-pill').textContent = user.email || 'Usuario';
     window.scrollTo(0, 0);
+    const access = await checkAccess(user);
+    if(!access.allowed){
+      document.getElementById('screen-paywall').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+      return;
+    }
+    document.getElementById('screen-paywall').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
     window.goToDashboard();
     await loadSimulations();
   } else {
     currentUser = null;
     document.getElementById('app').style.display = 'none';
+    document.getElementById('screen-paywall').style.display = 'none';
     document.getElementById('screen-login').style.display = 'flex';
     window.scrollTo(0, 0);
   }
@@ -1391,6 +1498,7 @@ window.saveSimulation = async function(){
       createdAt: serverTimestamp()
     });
     showToast('Simulação salva com sucesso.');
+    await incrementSimsUsadas();
     await loadSimulations();
     window.goToDashboard();
   }catch(err){

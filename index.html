@@ -981,7 +981,17 @@ window.goToDashboard = function(){
   renderDashboard();
 };
 
-window.startNewSimulation = function(){
+window.startNewSimulation = async function(){
+  // Verificar acesso antes de iniciar nova simulação
+  if(currentUser){
+    const access = await checkAccess(currentUser);
+    if(!access.allowed){
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('screen-paywall').style.display = 'flex';
+      window.scrollTo(0, 0);
+      return;
+    }
+  }
   editingSimId = null;
   resetForm();
   document.getElementById('form-title').textContent = 'Nova simulação';

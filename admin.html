@@ -2,233 +2,784 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TipCerto — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@600;700&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TipCerto — Viabilidade de Engorda</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#D4A24C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TipCerto">
+<link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600;700;800&family=Roboto+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
   :root{
-    --bg:#1C1810;--panel:#252019;--panel-2:#2E281E;--line:#3A3324;--line-strong:#4A4230;
-    --sand:#E8DFC8;--sand-dim:#B8AD92;--green:#7C9468;--green-dim:#5C7049;
-    --terracotta:#B8633D;--gold:#D4A24C;--radius:2px;
+    --bg: #1C1810;
+    --panel: #252019;
+    --panel-2: #2E281E;
+    --line: #3A3324;
+    --line-strong: #4A4230;
+    --sand: #E8DFC8;
+    --sand-dim: #B8AD92;
+    --green: #7C9468;
+    --green-dim: #5C7049;
+    --terracotta: #B8633D;
+    --terracotta-dim: #8C4A2C;
+    --gold: #D4A24C;
+    --radius: 2px;
   }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--sand);font-family:'Inter',sans-serif;min-height:100vh;}
-  .num{font-family:'Roboto Mono',monospace;}
-  h1,h2,h3{font-family:'Roboto Slab',serif;}
-  .spin{animation:spin .8s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(124,148,104,0.07), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(184,99,61,0.06), transparent 45%);
+    color: var(--sand);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .num{ font-family:'Roboto Mono', monospace; font-variant-numeric: tabular-nums; }
+  h1,h2,h3,.display{ font-family:'Roboto Slab', serif; }
 
-  /* Login */
-  #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;}
-  .login-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:36px;max-width:380px;width:100%;position:relative;}
-  .login-box::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;height:4px;background:linear-gradient(90deg,var(--terracotta),var(--gold),var(--green));}
+  ::selection{ background: var(--gold); color: #1C1810; }
 
-  /* Layout */
-  #admin-screen{display:none;}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:2px solid var(--line);background:rgba(46,40,30,0.6);}
-  .brand{display:flex;align-items:center;gap:10px;}
-  .brand-mark{width:32px;height:32px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-weight:800;font-size:14px;}
-  .container{max-width:1200px;margin:0 auto;padding:28px 24px;}
+  /* ===== Scaffolding ===== */
+  #app{ display:none; min-height:100vh; }
+  .screen{ display:none; min-height:100vh; }
+  .screen.active{ display:block; }
 
-  /* Cards de métricas */
-  .metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-bottom:28px;}
-  .metric-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
-  .metric-card .label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--sand-dim);margin-bottom:8px;}
-  .metric-card .value{font-size:28px;font-weight:700;font-family:'Roboto Mono';}
-  .metric-card .value.green{color:var(--green);}
-  .metric-card .value.gold{color:var(--gold);}
-  .metric-card .value.terra{color:var(--terracotta);}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 24px;
+    border-bottom: 2px solid var(--line);
+    background: linear-gradient(180deg, rgba(46,40,30,0.6), transparent);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+  }
+  .brand .mark{
+    width:34px; height:34px; border:2px solid var(--gold); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold); font-family:'Roboto Slab'; font-weight:800; font-size:15px;
+    letter-spacing:-1px;
+  }
+  .brand .word{ font-size:20px; font-weight:700; letter-spacing:0.5px; }
+  .brand .tag{ font-size:11px; color:var(--sand-dim); letter-spacing:1.5px; text-transform:uppercase; margin-top:1px;}
 
-  /* Tabela */
-  .table-wrap{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
-  .table-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);}
-  .table-head h3{font-size:16px;}
-  table{width:100%;border-collapse:collapse;}
-  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--sand-dim);padding:12px 16px;border-bottom:1px solid var(--line);font-weight:600;}
-  td{padding:14px 16px;border-bottom:1px solid rgba(58,51,36,0.4);font-size:13.5px;vertical-align:middle;}
-  tr:last-child td{border-bottom:none;}
-  tr:hover td{background:rgba(46,40,30,0.4);}
+  .topbar-actions{ display:flex; align-items:center; gap:14px; }
+  .user-pill{
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; color:var(--sand-dim);
+    border:1px solid var(--line-strong); padding:6px 12px; border-radius:20px;
+  }
+  .iconbtn{
+    background:transparent; border:1px solid var(--line-strong); color:var(--sand-dim);
+    width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:16px; transition: all .15s ease;
+  }
+  .iconbtn:hover{ border-color: var(--gold); color: var(--gold); }
 
-  /* Status badges */
-  .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:600;}
-  .badge.ativo{background:rgba(124,148,104,0.2);color:var(--green);border:1px solid var(--green-dim);}
-  .badge.trial{background:rgba(212,162,76,0.15);color:var(--gold);border:1px solid rgba(212,162,76,0.3);}
-  .badge.expirado{background:rgba(184,99,61,0.15);color:var(--terracotta);border:1px solid rgba(184,99,61,0.3);}
+  .container{ max-width: 1180px; margin:0 auto; padding: 28px 24px 80px; }
 
-  /* Botões */
-  .btn{font-family:'Inter';font-weight:600;font-size:13px;padding:8px 16px;border-radius:var(--radius);border:1.5px solid transparent;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
-  .btn-primary{background:var(--green);color:#16190F;}
-  .btn-ghost{background:transparent;border-color:var(--line-strong);color:var(--sand);}
-  .btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
-  .btn-sm{padding:5px 10px;font-size:12px;}
-  .btn-gold{background:var(--gold);color:#1C1810;}
+  /* ===== Buttons ===== */
+  .btn{
+    font-family:'Inter'; font-weight:600; font-size:14px;
+    padding: 13px 26px; border-radius: var(--radius); border: 2px solid transparent;
+    cursor:pointer; transition: all .15s ease; display:inline-flex; align-items:center; gap:8px;
+    letter-spacing:0.2px;
+  }
+  .btn-primary{ background: var(--green); color:#16190F; }
+  .btn-primary:hover{ background:#8CA476; transform: translateY(-1px); }
+  .btn-ghost{ background:transparent; border-color: var(--line-strong); color: var(--sand); }
+  .btn-ghost:hover{ border-color: var(--gold); color: var(--gold); }
+  .btn-block{ width:100%; justify-content:center; }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; }
+  .btn-danger-outline{ background:transparent; border-color: var(--terracotta-dim); color: var(--terracotta); }
+  .btn-danger-outline:hover{ border-color: var(--terracotta); background: rgba(184,99,61,0.1); }
 
-  /* Campo */
-  .field label{display:block;font-size:12px;color:var(--sand-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:600;}
-  .field input,.field select{width:100%;background:var(--bg);border:1px solid var(--line-strong);color:var(--sand);padding:10px 12px;border-radius:var(--radius);font-family:'Inter';font-size:14px;outline:none;}
-  .field input:focus{border-color:var(--gold);}
-  .field{margin-bottom:14px;}
+  /* ===== Login Screen ===== */
+  #screen-login{
+    display:none; align-items:center; justify-content:center; min-height:100vh; padding: 24px;
+  }
+  .login-box{
+    width:100%; max-width: 400px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+    position:relative;
+  }
+  .login-box::before{
+    content:''; position:absolute; top:-2px; left:-2px; right:-2px; height:4px;
+    background: linear-gradient(90deg, var(--terracotta), var(--gold), var(--green));
+  }
+  .login-brand{ text-align:center; margin-bottom: 8px; }
+  .login-brand .mark{
+    width:56px; height:56px; border:2.5px solid var(--gold); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin: 0 auto 14px;
+    color:var(--gold); font-size:24px; font-weight:800;
+  }
+  .login-brand h1{ font-size: 28px; letter-spacing:0.5px; }
+  .login-brand p{ color: var(--sand-dim); font-size:13.5px; margin-top:6px; line-height:1.5; }
 
-  /* Modal */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:24px;}
-  .modal-overlay.open{display:flex;}
-  .modal{background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius);padding:28px;max-width:400px;width:100%;position:relative;}
-  .modal::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;height:3px;background:linear-gradient(90deg,var(--terracotta),var(--gold),var(--green));}
+  .field{ margin-bottom: 16px; }
+  .field label{ display:block; font-size:12px; color:var(--sand-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; font-weight:600;}
+  .field input{
+    width:100%; background: var(--bg); border: 1px solid var(--line-strong);
+    color: var(--sand); padding: 12px 14px; border-radius: var(--radius);
+    font-family:'Inter'; font-size:14.5px; outline:none; transition: border-color .15s ease;
+  }
+  .field input:focus{ border-color: var(--gold); }
+  .field input.num-input{ font-family:'Roboto Mono'; }
 
-  /* Toast */
-  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--panel-2);border:1px solid var(--line-strong);color:var(--sand);padding:12px 20px;border-radius:var(--radius);font-size:14px;z-index:999;transition:transform .25s;display:flex;align-items:center;gap:8px;}
-  #toast.show{transform:translateX(-50%) translateY(0);}
+  .login-divider{ display:flex; align-items:center; gap:12px; margin: 20px 0; color: var(--sand-dim); font-size:12px; }
+  .login-divider::before, .login-divider::after{ content:''; flex:1; height:1px; background: var(--line-strong); }
 
-  #boot-loader{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;}
+  .login-switch{ text-align:center; margin-top:18px; font-size:13.5px; color: var(--sand-dim); }
+  .login-switch a{ color: var(--gold); cursor:pointer; text-decoration:none; font-weight:600;}
+  .login-switch a:hover{ text-decoration:underline; }
+
+  .auth-error{
+    background: rgba(184,99,61,0.15); border:1px solid var(--terracotta-dim); color:#E2A788;
+    padding: 10px 14px; border-radius: var(--radius); font-size: 13px; margin-bottom:16px; display:none;
+  }
+
+  /* ===== Dashboard / History ===== */
+  .page-head{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom: 24px; flex-wrap:wrap; gap:14px;}
+  .page-head h2{ font-size: 26px; }
+  .page-head .sub{ color: var(--sand-dim); font-size: 13.5px; margin-top:4px; }
+
+  .empty-state{
+    border: 1px dashed var(--line-strong); border-radius: var(--radius);
+    padding: 60px 30px; text-align:center; color: var(--sand-dim);
+  }
+  .empty-state .ico{ font-size: 38px; color: var(--line-strong); margin-bottom: 14px; display:block;}
+  .empty-state h3{ color: var(--sand); font-size:17px; margin-bottom:6px; }
+  .empty-state p{ font-size:13.5px; max-width:340px; margin: 0 auto 20px; line-height:1.5; }
+
+  .sim-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:14px; }
+  .sim-card{
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 20px; cursor:pointer; transition: all .15s ease; position:relative; overflow:hidden;
+  }
+  .sim-card:hover{ border-color: var(--line-strong); transform: translateY(-2px); }
+  .sim-card .bar{ position:absolute; left:0; top:0; bottom:0; width:4px; }
+  .sim-card .bar.pos{ background: var(--green); }
+  .sim-card .bar.neg{ background: var(--terracotta); }
+  .sim-card .name{ font-weight:600; font-size:15px; margin-bottom:2px; padding-left:6px;}
+  .sim-card .date{ font-size:11.5px; color: var(--sand-dim); padding-left:6px; margin-bottom:14px; }
+  .sim-card .result-row{ display:flex; justify-content:space-between; align-items:baseline; padding-left:6px;}
+  .sim-card .result-label{ font-size:11px; color:var(--sand-dim); text-transform:uppercase; letter-spacing:0.5px;}
+  .sim-card .result-value{ font-size:19px; font-weight:600; }
+  .sim-card .result-value.pos{ color: var(--green); }
+  .sim-card .result-value.neg{ color: var(--terracotta); }
+  .sim-card .rent{ font-size: 12px; color:var(--sand-dim); padding-left:6px; margin-top:8px;}
+  .sim-card .del{
+    position:absolute; top:14px; right:14px; color: var(--sand-dim); background:none; border:none;
+    cursor:pointer; font-size:16px; opacity:0; transition: opacity .15s ease;
+  }
+  .sim-card:hover .del{ opacity:1; }
+  .sim-card .del:hover{ color: var(--terracotta); }
+
+  /* ===== Form Screen ===== */
+  .form-progress{
+    display:flex; gap:6px; margin-bottom: 28px;
+  }
+  .form-progress .step{ flex:1; height:4px; background: var(--line); border-radius:2px; transition: background .2s ease;}
+  .form-progress .step.done{ background: var(--green); }
+  .form-progress .step.active{ background: var(--gold); }
+
+  .block{
+    background: var(--panel); border:1px solid var(--line); border-radius: var(--radius);
+    padding: 26px 28px; margin-bottom: 20px;
+  }
+  .block-head{ display:flex; align-items:center; gap:12px; margin-bottom: 22px; padding-bottom:16px; border-bottom: 1px solid var(--line);}
+  .block-head .n{
+    width:30px; height:30px; border-radius:50%; border:1.5px solid var(--gold); color:var(--gold);
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0;
+    font-family:'Roboto Mono';
+  }
+  .block-head h3{ font-size:18px; letter-spacing:0.3px;}
+  .block-head .hint{ color:var(--sand-dim); font-size:12.5px; margin-top:2px;}
+
+  .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:16px 20px; }
+  .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:16px 20px; }
+  @media (max-width: 640px){ .grid2, .grid3{ grid-template-columns: 1fr; } }
+
+  .field-inline{ position:relative; }
+  .field-inline .prefix{
+    position:absolute; left:14px; top:38px; color: var(--sand-dim); font-size:14px; font-family:'Roboto Mono'; pointer-events:none;
+  }
+  .field-inline input.has-prefix{ padding-left: 32px; }
+  .field-inline .suffix{
+    position:absolute; right:14px; top:38px; color: var(--sand-dim); font-size:12.5px; pointer-events:none;
+  }
+
+  .form-nav{ display:flex; justify-content:space-between; gap:12px; margin-top: 24px; }
+  .form-nav .btn{ flex:1; max-width:200px; }
+
+  /* ===== Results screen ===== */
+  .verdict-banner{
+    border-radius: var(--radius); padding: 30px 32px; margin-bottom: 24px;
+    border: 1px solid var(--line); position:relative; overflow:hidden;
+  }
+  .verdict-banner.pos{ background: linear-gradient(135deg, rgba(124,148,104,0.16), rgba(124,148,104,0.04)); border-color: var(--green-dim); }
+  .verdict-banner.neg{ background: linear-gradient(135deg, rgba(184,99,61,0.16), rgba(184,99,61,0.04)); border-color: var(--terracotta-dim); }
+  .verdict-label{ font-size:12.5px; text-transform:uppercase; letter-spacing:1.5px; color: var(--sand-dim); margin-bottom:8px; font-weight:600;}
+  .verdict-value{ font-size: 44px; font-weight:700; line-height:1; margin-bottom: 6px; }
+  .verdict-value.pos{ color: var(--green); }
+  .verdict-value.neg{ color: var(--terracotta); }
+  .verdict-sub{ color: var(--sand-dim); font-size:14px; }
+
+  /* thermometer */
+  .thermo-wrap{ margin-top: 24px; }
+  .thermo-track{
+    height: 14px; border-radius: 7px; background: var(--bg);
+    border: 1px solid var(--line-strong);
+    position:relative; overflow:visible;
+  }
+  .thermo-fill{
+    height:100%; border-radius:7px;
+    background: linear-gradient(90deg, var(--terracotta), var(--gold) 48%, var(--green));
+    position:relative;
+  }
+  .thermo-pointer{
+    position:absolute; top:-7px; width:3px; height:28px; background: var(--sand);
+    border-radius:2px; transform: translateX(-50%);
+    box-shadow: 0 0 0 2px var(--bg);
+  }
+  .thermo-scale{ display:flex; justify-content:space-between; font-size:11px; color:var(--sand-dim); margin-top:8px; font-family:'Roboto Mono';}
+
+  .results-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;}
+  @media (max-width: 760px){ .results-grid{ grid-template-columns: 1fr; } }
+
+  .result-block{ background: var(--panel); border:1px solid var(--line); border-radius: var(--radius); padding:22px 24px; }
+  .result-block h4{ font-size:14px; text-transform:uppercase; letter-spacing:1px; color: var(--gold); margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--line); }
+  .kv-row{ display:flex; justify-content:space-between; align-items:center; padding:8px 0; font-size:14px; border-bottom: 1px solid rgba(58,51,36,0.5);}
+  .kv-row:last-child{ border-bottom:none; }
+  .kv-row .k{ color: var(--sand-dim); }
+  .kv-row .v{ font-weight:600; }
+  .kv-row .v.highlight{ color: var(--gold); }
+  .kv-row.total{ border-top: 1.5px solid var(--line-strong); margin-top:6px; padding-top:14px; }
+  .kv-row.total .k{ color: var(--sand); font-weight:600;}
+  .kv-row.total .v{ font-size:17px; }
+
+  .results-actions{ display:flex; gap:12px; margin-top:8px; flex-wrap:wrap;}
+
+  /* ===== Toast ===== */
+  #toast{
+    position:fixed; bottom:24px; left:50%; transform: translateX(-50%) translateY(100px);
+    background: var(--panel-2); border:1px solid var(--line-strong); color: var(--sand);
+    padding: 14px 22px; border-radius: var(--radius); font-size:14px; z-index:999;
+    transition: transform .25s ease; display:flex; align-items:center; gap:10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  #toast.show{ transform: translateX(-50%) translateY(0); }
+  #toast.error{ border-color: var(--terracotta-dim); }
+  #toast .ico{ color: var(--green); }
+  #toast.error .ico{ color: var(--terracotta); }
+
+  /* ===== Loading ===== */
+  .spin{ animation: spin 0.8s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  #boot-loader{
+    position:fixed; inset:0; background: var(--bg); display:flex; align-items:center; justify-content:center; z-index:1000;
+  }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+
+  input:focus-visible, button:focus-visible, a:focus-visible{ outline: 2px solid var(--gold); outline-offset:2px; }
+
+  /* ===== IMPRESSÃO / PDF ===== */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #fff !important; color: #1a1a1a !important; font-family: 'Inter', sans-serif; }
+    #boot-loader, #screen-login, #screen-dashboard, #screen-form,
+    .topbar, .results-actions, #btn-delete-sim, .thermo-wrap + * { display: none !important; }
+    #app, #screen-results { display: block !important; }
+    #screen-results { display: block !important; }
+    .screen { display: none !important; }
+    #screen-results { display: block !important; min-height: auto !important; }
+    .container { max-width: 100% !important; padding: 0 !important; }
+    .pdf-header { display: block !important; }
+    .verdict-banner { border: 2px solid #333 !important; background: #f5f5f5 !important; border-radius: 4px; padding: 16px 20px; margin-bottom: 16px; }
+    .verdict-banner.pos { background: #e8f5e9 !important; border-color: #4caf50 !important; }
+    .verdict-banner.neg { background: #fbe9e7 !important; border-color: #e64a19 !important; }
+    .verdict-value { font-size: 32px !important; }
+    .verdict-value.pos { color: #2e7d32 !important; }
+    .verdict-value.neg { color: #bf360c !important; }
+    .verdict-sub { color: #555 !important; }
+    .verdict-label { color: #555 !important; }
+    .thermo-wrap { display: block !important; }
+    .thermo-track { background: #eee !important; border: 1px solid #ccc !important; }
+    .thermo-fill { -webkit-print-color-adjust: exact !important; }
+    .results-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px !important; margin-bottom: 12px !important; }
+    .result-block { background: #f9f9f9 !important; border: 1px solid #ddd !important; border-radius: 4px; padding: 14px 16px; break-inside: avoid; }
+    .result-block h4 { color: #7a5c1a !important; border-bottom: 1px solid #ddd !important; padding-bottom: 8px; margin-bottom: 10px; font-size: 12px; }
+    .kv-row { border-bottom: 1px solid #eee !important; padding: 5px 0 !important; font-size: 13px; }
+    .kv-row .k { color: #555 !important; }
+    .kv-row .v { color: #1a1a1a !important; font-weight: 600; }
+    .kv-row.total { border-top: 1.5px solid #ccc !important; }
+    #lote-block { background: #fffde7 !important; border: 1.5px solid #f9a825 !important; border-radius: 4px; padding: 14px 16px; margin-bottom: 12px; break-inside: avoid; }
+    #lote-block h4 { color: #7a5c1a !important; }
+    .pdf-dados { display: block !important; }
+    .pdf-dados-grid { display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 10px; margin-bottom: 12px; }
+    .pdf-dados-bloco { background: #f5f5f5 !important; border: 1px solid #ddd !important; border-radius: 4px; padding: 10px 12px; break-inside: avoid; }
+    .pdf-dados-bloco h5 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #777; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    .pdf-dados-bloco .prow { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+    .pdf-dados-bloco .prow:last-child { border-bottom: none; }
+    .pdf-dados-bloco .prow span:last-child { font-weight: 600; }
+  }
 </style>
 </head>
 <body>
 
-<div id="boot-loader"><i class="ti ti-loader-2 spin" style="font-size:28px;color:var(--gold);"></i></div>
+<div id="boot-loader"><i class="ti ti-loader-2 spin" style="font-size:28px; color:var(--gold);"></i></div>
 
-<!-- LOGIN -->
-<div id="login-screen">
+<!-- ===================== LOGIN ===================== -->
+<div class="screen" id="screen-login">
   <div class="login-box">
-    <div style="text-align:center;margin-bottom:24px;">
-      <div style="width:48px;height:48px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--gold);font-weight:800;font-size:20px;">@</div>
-      <h2 style="font-size:20px;">TipCerto Admin</h2>
-      <p style="color:var(--sand-dim);font-size:13px;margin-top:4px;">Acesso restrito</p>
+    <div class="login-brand">
+      <div class="mark">@</div>
+      <h1>TipCerto</h1>
+      <p>Calcule a viabilidade da sua operação de recria e engorda antes de fechar o negócio.</p>
     </div>
-    <div id="login-error" style="display:none;background:rgba(184,99,61,0.15);border:1px solid #8C4A2C;color:#E2A788;padding:10px 14px;border-radius:var(--radius);font-size:13px;margin-bottom:14px;"></div>
-    <div class="field"><label>E-mail</label><input type="email" id="login-email"></div>
-    <div class="field"><label>Senha</label><input type="password" id="login-password"></div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="window.doLogin()">
-      <i class="ti ti-login-2"></i> Entrar
+
+    <div class="auth-error" id="auth-error"></div>
+
+    <form id="form-login" onsubmit="return false;">
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="login-email" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="login-password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary btn-block" id="btn-login" onclick="window.handleLogin()">
+        <i class="ti ti-login-2"></i> Entrar
+      </button>
+    </form>
+
+    <div class="login-divider">ou</div>
+
+    <button class="btn btn-ghost btn-block" onclick="window.handleGoogleLogin()">
+      <i class="ti ti-brand-google"></i> Entrar com Google
     </button>
+
+    <div class="login-switch">
+      Ainda não tem conta? <a onclick="window.showSignup()">Criar conta</a>
+    </div>
   </div>
 </div>
 
-<!-- ADMIN -->
-<div id="admin-screen">
+<!-- ===================== SIGNUP ===================== -->
+<div class="screen" id="screen-signup">
+  <div id="screen-login" class="login-box" style="display:none;"></div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<!-- ===================== PAYWALL ===================== -->
+<div id="screen-paywall" style="display:none; min-height:100vh; background:var(--bg); align-items:center; justify-content:center; padding:24px;">
+  <div style="max-width:440px; width:100%; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:40px 36px; position:relative;">
+    <div style="position:absolute;top:-2px;left:-2px;right:-2px;height:4px;background:linear-gradient(90deg,var(--terracotta),var(--gold),var(--green));"></div>
+    <div style="text-align:center; margin-bottom:28px;">
+      <div style="width:56px;height:56px;border:2.5px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:var(--gold);font-size:24px;font-weight:800;">@</div>
+      <h2 style="font-family:Roboto Slab,serif;font-size:22px;margin-bottom:8px;">Suas simulacoes gratuitas acabaram</h2>
+      <p style="color:var(--sand-dim);font-size:14px;line-height:1.6;">Voce usou suas 2 simulacoes gratis. Assine o TipCerto para simulacoes ilimitadas.</p>
+    </div>
+    <div style="background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius);padding:20px;margin-bottom:24px;">
+      <div style="font-size:36px;font-weight:800;font-family:Roboto Slab,serif;color:var(--gold);">R$ 115<span style="font-size:16px;color:var(--sand-dim);font-weight:400;">/ano</span></div>
+      <div style="font-size:12px;color:var(--sand-dim);margin-top:4px;">aproximadamente R$ 9,58/mes</div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--sand-dim);">
+        <div>Simulacoes ilimitadas</div>
+        <div>Historico completo salvo</div>
+        <div>Relatorio PDF</div>
+        <div>Previsao de data de abate</div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-assinar" onclick="window.iniciarPagamento()">
+      <i class="ti ti-credit-card"></i> Assinar agora — R$ 115,00/ano
+    </button>
+    <div id="paywall-loading" style="display:none;text-align:center;margin-top:12px;color:var(--sand-dim);font-size:13px;">
+      <i class="ti ti-loader-2 spin"></i> Gerando link de pagamento...
+    </div>
+    <div style="text-align:center;margin-top:16px;">
+      <button class="btn btn-ghost" onclick="window.handleLogout()" style="font-size:13px;padding:8px 16px;">Sair da conta</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
   <div class="topbar">
     <div class="brand">
-      <div class="brand-mark">@</div>
+      <div class="mark">@</div>
       <div>
-        <div style="font-size:16px;font-weight:700;">TipCerto Admin</div>
-        <div style="font-size:11px;color:var(--sand-dim);letter-spacing:1px;text-transform:uppercase;">Painel de controle</div>
+        <div class="word">TipCerto</div>
+        <div class="tag">Viabilidade de engorda</div>
       </div>
     </div>
-    <div style="display:flex;gap:12px;align-items:center;">
-      <button class="btn btn-ghost btn-sm" onclick="window.loadUsers()"><i class="ti ti-refresh"></i> Atualizar</button>
-      <button class="btn btn-ghost btn-sm" onclick="window.doLogout()"><i class="ti ti-logout"></i> Sair</button>
+    <div class="topbar-actions">
+      <div class="user-pill"><i class="ti ti-user-circle"></i> <span id="user-email-pill">—</span></div>
+      <button class="iconbtn" title="Sair" onclick="window.handleLogout()"><i class="ti ti-logout"></i></button>
+    </div>
+  </div>
+
+  <!-- ============ HISTORY / DASHBOARD ============ -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="container">
+      <div class="page-head">
+        <div>
+          <h2>Suas simulações</h2>
+          <div class="sub" id="sim-count">—</div>
+        </div>
+        <button class="btn btn-primary" onclick="window.startNewSimulation()">
+          <i class="ti ti-plus"></i> Nova simulação
+        </button>
+      </div>
+
+      <div id="dashboard-loading" style="text-align:center; padding:60px 0; color:var(--sand-dim);">
+        <i class="ti ti-loader-2 spin" style="font-size:24px;"></i>
+      </div>
+
+      <div id="empty-dashboard" class="empty-state" style="display:none;">
+        <i class="ti ti-stack-2 ico"></i>
+        <h3>Nenhuma simulação ainda</h3>
+        <p>Monte sua primeira simulação de recria/engorda e veja se a operação fecha no lucro antes de comprar o lote.</p>
+        <button class="btn btn-primary" onclick="window.startNewSimulation()">
+          <i class="ti ti-plus"></i> Nova simulação
+        </button>
+      </div>
+
+      <div class="sim-grid" id="sim-grid" style="display:none;"></div>
     </div>
   </div>
 
-  <div class="container">
-    <!-- Métricas -->
-    <div class="metrics">
-      <div class="metric-card">
-        <div class="label">Total de usuários</div>
-        <div class="value gold" id="m-total">—</div>
+  <!-- ============ FORM ============ -->
+  <div class="screen" id="screen-form">
+    <div class="container" style="max-width: 820px;">
+      <div class="page-head">
+        <div>
+          <h2 id="form-title">Nova simulação</h2>
+          <div class="sub">Preencha os dados da operação por etapas</div>
+        </div>
+        <button class="btn btn-ghost" onclick="window.goToDashboard()"><i class="ti ti-x"></i> Cancelar</button>
       </div>
-      <div class="metric-card">
-        <div class="label">Assinaturas ativas</div>
-        <div class="value green" id="m-ativos">—</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">Em trial</div>
-        <div class="value" id="m-trial">—</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">Expirados</div>
-        <div class="value terra" id="m-expirados">—</div>
-      </div>
-      <div class="metric-card">
-        <div class="label">Receita estimada/ano</div>
-        <div class="value gold num" id="m-receita">—</div>
-      </div>
-    </div>
 
-    <!-- Filtro e busca -->
-    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
-      <input type="text" id="search-input" placeholder="Buscar por e-mail..." oninput="window.filterUsers()" style="background:var(--panel);border:1px solid var(--line-strong);color:var(--sand);padding:10px 14px;border-radius:var(--radius);font-family:'Inter';font-size:14px;outline:none;flex:1;min-width:200px;">
-      <select id="filter-status" onchange="window.filterUsers()" style="background:var(--panel);border:1px solid var(--line-strong);color:var(--sand);padding:10px 14px;border-radius:var(--radius);font-family:'Inter';font-size:14px;outline:none;">
-        <option value="">Todos os status</option>
-        <option value="ativo">Ativo</option>
-        <option value="trial">Trial</option>
-        <option value="expirado">Expirado</option>
-      </select>
-    </div>
+      <div class="form-progress">
+        <div class="step" data-step="1"></div>
+        <div class="step" data-step="2"></div>
+        <div class="step" data-step="3"></div>
+        <div class="step" data-step="4"></div>
+        <div class="step" data-step="5"></div>
+      </div>
 
-    <!-- Tabela -->
-    <div class="table-wrap">
-      <div class="table-head">
-        <h3>Usuários</h3>
-        <span id="user-count" style="font-size:13px;color:var(--sand-dim);">—</span>
+      <form id="sim-form" onsubmit="return false;">
+
+        <!-- Nome da simulação -->
+        <div class="form-step" data-step="1">
+          <div class="block">
+            <div class="block-head">
+              <div class="n">●</div>
+              <div>
+                <h3>Identificação</h3>
+                <div class="hint">Dê um nome pra essa simulação (ex: "Lote Fazenda Sta Rita - Jun/26")</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>Nome da simulação</label>
+                <input type="text" id="f-nome" placeholder="Ex: Lote Fazenda Sta Rita - Jun/26" style="grid-column:1/-1">
+              </div>
+              <div class="field">
+                <label>Quantidade de animais</label>
+                <input type="number" step="1" min="1" class="num-input" id="f-qtd-animais" placeholder="40">
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block-head">
+              <div class="n">1</div>
+              <div>
+                <h3>Entrada do animal</h3>
+                <div class="hint">Dados da compra e chegada do lote</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Peso de entrada (kg)</label><input type="number" step="any" class="num-input" id="f-peso-entrada" placeholder="410" oninput="window.updatePrevisao()"></div>
+              <div class="field field-inline"><label>Valor do kg de compra</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-kg-compra" placeholder="12,70"></div>
+              <div class="field field-inline"><label>Frete</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-frete" placeholder="60,00"></div>
+              <div class="field field-inline"><label>Protocolo sanitário de chegada</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-protocolo" placeholder="20,00"></div>
+              <div class="field field-inline"><label>RC considerado na chegada</label><input type="number" step="any" class="num-input" id="f-rc-entrada" placeholder="50"><span class="suffix">%</span></div>
+              <div class="field field-inline"><label>Operacional por cabeça/mês</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-operacional-mes" placeholder="60,00"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dieta inicial / final -->
+        <div class="form-step" data-step="2" style="display:none;">
+          <div class="block">
+            <div class="block-head">
+              <div class="n">2</div>
+              <div>
+                <h3>Dieta inicial</h3>
+                <div class="hint">Primeira fase de trato</div>
+              </div>
+            </div>
+            <div class="grid3">
+              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd1" placeholder="1,100" oninput="window.updatePrevisao()"><span class="suffix">kg/dia</span></div>
+              <div class="field"><label>Dias de trato</label><input type="number" step="any" class="num-input" id="f-dias1" placeholder="28" oninput="window.updatePrevisao()"></div>
+              <div class="field field-inline"><label>Valor do kg da dieta</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-dieta1" placeholder="1,13"></div>
+              <div class="field field-inline" style="grid-column: 1 / -1;"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo1" placeholder="1,80"><span class="suffix">%</span></div>
+            </div>
+          </div>
+
+
+
+          <div class="block">
+            <div class="block-head">
+              <div class="n">4</div>
+              <div>
+                <h3>Dieta final</h3>
+                <div class="hint">Fase de terminação</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida-2" placeholder="550" oninput="window.updatePrevisao()"></div>
+              <div class="field field-inline"><label>GMD (PV)</label><input type="number" step="any" class="num-input" id="f-gmd2" placeholder="1,450" oninput="window.updatePrevisao()"><span class="suffix">kg/dia</span></div>
+              <div class="field">
+                <label>Dias de trato <span style="color:var(--gold);font-size:11px;">(calculado automaticamente)</span></label>
+                <div id="f-dias2-display" style="background:var(--bg);border:1px solid var(--line-strong);padding:12px 14px;border-radius:var(--radius);font-family:'Roboto Mono';font-size:14.5px;color:var(--gold);">— dias</div>
+              </div>
+              <div class="field field-inline"><label>Valor do kg da dieta</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-dieta2" placeholder="1,13"></div>
+              <div class="field field-inline"><label>Consumo esperado (% do peso vivo)</label><input type="number" step="any" class="num-input" id="f-consumo2" placeholder="1,90"><span class="suffix">%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saída -->
+        <div class="form-step" data-step="3" style="display:none;">
+          <div class="block">
+            <div class="block-head">
+              <div class="n">5</div>
+              <div>
+                <h3>Saída / Venda</h3>
+                <div class="hint">Dados de peso final e comercialização</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Peso vivo de saída (kg)</label><input type="number" step="any" class="num-input" id="f-peso-saida" placeholder="550" oninput="window.syncPesoSaida(this)"></div>
+              <div class="field field-inline"><label>RC de saída</label><input type="number" step="any" class="num-input" id="f-rc-saida" placeholder="55"><span class="suffix">%</span></div>
+              <div class="field field-inline"><label>Valor da arroba na venda</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-valor-arroba-venda" placeholder="330,00"></div>
+              <div class="field field-inline"><label>Taxa de abate</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-taxa-abate" placeholder="72,50"></div>
+              <div class="field field-inline"><label>Senar + Funrural</label><input type="number" step="any" class="num-input" id="f-senar-funrural" placeholder="1,63"><span class="suffix">%</span></div>
+              <div class="field field-inline"><label>Acompanhamento de abate</label><span class="prefix">R$</span><input type="number" step="any" class="num-input has-prefix" id="f-acompanhamento" placeholder="3,75"></div>
+            </div>
+          </div>
+
+          <!-- Previsão de data de abate -->
+          <div class="block" style="border-color:var(--gold); background:linear-gradient(135deg,rgba(212,162,76,0.08),transparent);">
+            <div class="block-head">
+              <div class="n" style="border-color:var(--gold);color:var(--gold);">📅</div>
+              <div>
+                <h3>Previsão de abate</h3>
+                <div class="hint">Informe a data de entrada e o sistema calcula quando o lote estará pronto</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>Data de entrada do rebanho</label>
+                <input type="date" class="num-input" id="f-data-entrada" oninput="window.updateDataAbate()">
+              </div>
+              <div class="field">
+                <label>Data prevista de abate <span style="color:var(--gold);font-size:11px;">(calculada)</span></label>
+                <div id="data-abate-display" style="background:var(--bg);border:1px solid var(--line-strong);padding:12px 14px;border-radius:var(--radius);font-family:'Roboto Mono';font-size:14px;color:var(--gold);">— preencha a data de entrada</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financiamento -->
+        <div class="form-step" data-step="4" style="display:none;">
+          <div class="block">
+            <div class="block-head">
+              <div class="n">6</div>
+              <div>
+                <h3>Financiamento</h3>
+                <div class="hint">Deixe zerado se a operação for 100% capital próprio</div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field field-inline"><label>% da operação financiada</label><input type="number" step="any" class="num-input" id="f-valor-financiado" placeholder="0" min="0" max="100"><span class="suffix">%</span></div>
+              <div class="field field-inline"><label>Taxa de juros</label><input type="number" step="any" class="num-input" id="f-taxa-juros" placeholder="8,0"><span class="suffix">% a.a.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review -->
+        <div class="form-step" data-step="5" style="display:none;">
+          <div class="block">
+            <div class="block-head">
+              <div class="n"><i class="ti ti-check" style="font-size:14px;"></i></div>
+              <div>
+                <h3>Tudo certo?</h3>
+                <div class="hint">Revise rapidamente e calcule o resultado</div>
+              </div>
+            </div>
+            <div id="review-summary" style="font-size:14px; color:var(--sand-dim); line-height:1.9;"></div>
+          </div>
+        </div>
+
+        <div class="form-nav">
+          <button type="button" class="btn btn-ghost" id="btn-prev" onclick="window.prevStep()" style="display:none;">
+            <i class="ti ti-arrow-left"></i> Voltar
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-next" onclick="window.nextStep()">
+            Continuar <i class="ti ti-arrow-right"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ RESULTS ============ -->
+  <div class="screen" id="screen-results">
+    <div class="container">
+      <div class="page-head">
+        <div>
+          <h2 id="results-title">Resultado</h2>
+          <div class="sub">Balanço da operação</div>
+        </div>
+        <button class="btn btn-ghost" onclick="window.goToDashboard()"><i class="ti ti-arrow-left"></i> Voltar</button>
       </div>
-      <div id="table-loading" style="padding:40px;text-align:center;color:var(--sand-dim);">
-        <i class="ti ti-loader-2 spin" style="font-size:22px;"></i>
+
+      <!-- PDF HEADER -->
+      <div class="pdf-header" style="display:none; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #333;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:22px; font-weight:800; font-family:'Roboto Slab',serif;">TipCerto</div>
+            <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#777;">Relatório de Viabilidade de Engorda</div>
+          </div>
+          <div style="text-align:right; font-size:12px; color:#555;" id="pdf-data-geracao"></div>
+        </div>
+        <div style="margin-top:10px; font-size:16px; font-weight:700;" id="pdf-nome-sim"></div>
       </div>
-      <div id="table-container" style="display:none;overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>E-mail</th>
-              <th>Status</th>
-              <th>Simulações</th>
-              <th>Cadastro</th>
-              <th>Expira em</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="users-tbody"></tbody>
-        </table>
+
+      <!-- DADOS DA SIMULAÇÃO (só no PDF) -->
+      <div class="pdf-dados" style="display:none; margin-bottom:14px;">
+        <div class="pdf-dados-grid">
+          <div class="pdf-dados-bloco">
+            <h5>Entrada</h5>
+            <div id="pdf-dados-entrada"></div>
+          </div>
+          <div class="pdf-dados-bloco">
+            <h5>Dietas</h5>
+            <div id="pdf-dados-dietas"></div>
+          </div>
+          <div class="pdf-dados-bloco">
+            <h5>Saída / Venda</h5>
+            <div id="pdf-dados-saida"></div>
+          </div>
+        </div>
       </div>
-      <div id="table-empty" style="display:none;padding:40px;text-align:center;color:var(--sand-dim);">
-        Nenhum usuário encontrado.
+
+      <div class="verdict-banner" id="verdict-banner">
+        <div class="verdict-label" id="verdict-label">Resultado da operação</div>
+        <div class="verdict-value" id="verdict-value">R$ 0,00</div>
+        <div class="verdict-sub" id="verdict-sub">Rentabilidade: 0%</div>
+
+        <div class="thermo-wrap">
+          <div class="thermo-track">
+            <div class="thermo-fill" id="thermo-fill" style="width:100%;">
+              <div class="thermo-pointer" id="thermo-pointer" style="left:50%;"></div>
+            </div>
+          </div>
+          <div class="thermo-scale">
+            <span>Prejuízo</span>
+            <span>Equilíbrio</span>
+            <span>Lucro</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-block">
+          <h4>Custos</h4>
+          <div class="kv-row"><span class="k">Nutrição (dietas)</span><span class="v num" id="r-nutricao">—</span></div>
+          <div class="kv-row"><span class="k">Operacional</span><span class="v num" id="r-operacional">—</span></div>
+          <div class="kv-row"><span class="k">Custo de aquisição</span><span class="v num" id="r-aquisicao">—</span></div>
+          <div class="kv-row"><span class="k">Juros do financiamento</span><span class="v num" id="r-juros">—</span></div>
+          <div class="kv-row total"><span class="k">Desembolso total</span><span class="v num" id="r-desembolso">—</span></div>
+        </div>
+
+        <div class="result-block">
+          <h4>Desempenho zootécnico</h4>
+          <div class="kv-row"><span class="k">Dias totais de operação</span><span class="v num" id="r-dias">—</span></div>
+          <div class="kv-row"><span class="k">Ganho de peso vivo</span><span class="v num" id="r-ganho-peso">—</span></div>
+          <div class="kv-row"><span class="k">Ganho de carcaça</span><span class="v num" id="r-ganho-carcaca">—</span></div>
+          <div class="kv-row"><span class="k">GMD da operação</span><span class="v num" id="r-gmd">—</span></div>
+          <div class="kv-row"><span class="k">Rendimento do ganho</span><span class="v num" id="r-rendimento">—</span></div>
+          <div class="kv-row"><span class="k">Custo por @ produzida</span><span class="v num highlight" id="r-custo-arroba">—</span></div>
+        </div>
+
+        <div class="result-block">
+          <h4>Receita de venda</h4>
+          <div class="kv-row"><span class="k">Peso de carcaça na saída</span><span class="v num" id="r-carcaca-saida">—</span></div>
+          <div class="kv-row"><span class="k">Valor bruto da venda</span><span class="v num" id="r-bruto">—</span></div>
+          <div class="kv-row"><span class="k">Taxas e impostos da venda</span><span class="v num" id="r-taxas-venda">—</span></div>
+          <div class="kv-row total"><span class="k">Valor líquido da venda</span><span class="v num" id="r-liquido-venda">—</span></div>
+        </div>
+
+        <div class="result-block">
+          <h4>Resultado final</h4>
+          <div class="kv-row"><span class="k">Receita líquida</span><span class="v num" id="r-receita">—</span></div>
+          <div class="kv-row"><span class="k">Desembolso total</span><span class="v num" id="r-desembolso2">—</span></div>
+          <div class="kv-row total"><span class="k">Lucro / Prejuízo</span><span class="v num" id="r-lucro">—</span></div>
+          <div class="kv-row"><span class="k">Rentabilidade da operação</span><span class="v num" id="r-rentabilidade">—</span></div>
+          <div class="kv-row"><span class="k">Rentabilidade ao mês</span><span class="v num" id="r-rentabilidade-mes">—</span></div>
+        </div>
+      </div>
+
+      <div class="result-block" id="lote-block" style="margin-bottom:20px; border-color:var(--gold);">
+        <h4 id="lote-title">Total do lote (— animais)</h4>
+        <div class="kv-row"><span class="k">Desembolso total do lote</span><span class="v num" id="r-lote-desembolso">—</span></div>
+        <div class="kv-row"><span class="k">Receita líquida do lote</span><span class="v num" id="r-lote-receita">—</span></div>
+        <div class="kv-row total"><span class="k">Lucro / Prejuízo do lote</span><span class="v num" id="r-lote-lucro">—</span></div>
+      </div>
+
+      <div class="results-actions">
+        <button class="btn btn-primary" onclick="window.saveSimulation()"><i class="ti ti-device-floppy"></i> Salvar</button>
+        <button class="btn btn-primary" onclick="window.saveAndPrint()" style="background:var(--gold);color:#1C1810;"><i class="ti ti-file-type-pdf"></i> Salvar e gerar relatório PDF</button>
+        <button class="btn btn-ghost" onclick="window.duplicateFromResults()"><i class="ti ti-copy"></i> Duplicar e ajustar</button>
+        <button class="btn btn-danger-outline" id="btn-delete-sim" style="display:none;" onclick="window.deleteCurrentSimulation()"><i class="ti ti-trash"></i> Excluir</button>
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- MODAL EDITAR USUÁRIO -->
-<div class="modal-overlay" id="modal-user">
-  <div class="modal">
-    <h3 style="margin-bottom:6px;">Editar usuário</h3>
-    <div id="modal-email" style="color:var(--sand-dim);font-size:13px;margin-bottom:20px;"></div>
-    <div class="field">
-      <label>Status</label>
-      <select id="modal-status">
-        <option value="trial">Trial</option>
-        <option value="ativo">Ativo</option>
-        <option value="expirado">Expirado</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Simulações grátis (trial)</label>
-      <input type="number" id="modal-sims-gratis" min="0" max="50">
-    </div>
-    <div class="field">
-      <label>Assinatura expira em</label>
-      <input type="date" id="modal-expira">
-    </div>
-    <div style="display:flex;gap:10px;margin-top:8px;">
-      <button class="btn btn-primary" onclick="window.salvarUsuario()"><i class="ti ti-check"></i> Salvar</button>
-      <button class="btn btn-ghost" onclick="window.fecharModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"><i class="ti ti-circle-check" style="color:var(--green);"></i><span id="toast-msg"></span></div>
+<div id="toast"><i class="ti ti-circle-check ico"></i><span id="toast-msg"></span></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, getDocs, doc, updateDoc,
-  query, orderBy, serverTimestamp
+  getFirestore, collection, addDoc, getDocs, deleteDoc, doc,
+  query, where, orderBy, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const ADMIN_EMAIL = 'agrosafra7@gmail.com';
+// Mostrar login por padrão até auth resolver
+document.getElementById('screen-login').style.display = 'flex';
 
+// ===== Firebase config =====
 const firebaseConfig = {
   apiKey: "AIzaSyAiQht_3b8YxHE1y24MwhWEdSebftqIwGU",
   authDomain: "arroba-db4a9.firebaseapp.com",
@@ -238,204 +789,802 @@ const firebaseConfig = {
   appId: "1:480151784908:web:40afbb873a15c5a5ab2169"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+const googleProvider = new GoogleAuthProvider();
 
-let allUsers = [];
-let editingDocId = null;
+let currentUser = null;
+let simulations = [];
+let currentStep = 1;
+const TOTAL_STEPS = 5;
+let editingSimId = null; // id da simulação sendo editada/visualizada, null = nova
 
-// ===== AUTH =====
-window.doLogin = async function(){
+// ===================== AUTH =====================
+let isSignupMode = false;
+
+window.showSignup = function(){
+  isSignupMode = true;
+  document.querySelector('#screen-login h1').textContent = 'Criar conta';
+  document.querySelector('#screen-login p').textContent = 'Comece a simular suas operações de engorda.';
+  document.querySelector('#btn-login').innerHTML = '<i class="ti ti-user-plus"></i> Criar conta';
+  document.querySelector('.login-switch').innerHTML = 'Já tem conta? <a onclick="window.showLogin()">Entrar</a>';
+};
+
+window.showLogin = function(){
+  isSignupMode = false;
+  document.querySelector('#screen-login h1').textContent = 'TipCerto';
+  document.querySelector('#screen-login p').textContent = 'Calcule a viabilidade da sua operação de recria e engorda antes de fechar o negócio.';
+  document.querySelector('#btn-login').innerHTML = '<i class="ti ti-login-2"></i> Entrar';
+  document.querySelector('.login-switch').innerHTML = 'Ainda não tem conta? <a onclick="window.showSignup()">Criar conta</a>';
+};
+
+function showAuthError(msg){
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideAuthError(){
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function friendlyAuthError(code){
+  const map = {
+    'auth/invalid-email': 'E-mail inválido.',
+    'auth/user-not-found': 'Não encontramos uma conta com esse e-mail.',
+    'auth/wrong-password': 'Senha incorreta.',
+    'auth/invalid-credential': 'E-mail ou senha incorretos.',
+    'auth/email-already-in-use': 'Já existe uma conta com esse e-mail.',
+    'auth/weak-password': 'A senha precisa ter pelo menos 6 caracteres.',
+    'auth/popup-closed-by-user': 'Login cancelado.'
+  };
+  return map[code] || 'Não foi possível completar a ação. Tente novamente.';
+}
+
+window.handleLogin = async function(){
+  hideAuthError();
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
-  const errEl = document.getElementById('login-error');
-  errEl.style.display = 'none';
-  if(email !== ADMIN_EMAIL){
-    errEl.textContent = 'Acesso negado.';
-    errEl.style.display = 'block';
-    return;
-  }
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch(e) {
-    errEl.textContent = 'E-mail ou senha incorretos.';
-    errEl.style.display = 'block';
+  if(!email || !password){ showAuthError('Preencha e-mail e senha.'); return; }
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+
+  try{
+    if(isSignupMode){
+      await createUserWithEmailAndPassword(auth, email, password);
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+  }catch(err){
+    showAuthError(friendlyAuthError(err.code));
+  }finally{
+    btn.disabled = false;
   }
 };
 
-window.doLogout = () => signOut(auth);
+window.handleGoogleLogin = async function(){
+  hideAuthError();
+  try{
+    await signInWithPopup(auth, googleProvider);
+  }catch(err){
+    showAuthError(friendlyAuthError(err.code));
+  }
+};
 
-onAuthStateChanged(auth, async user => {
+window.handleLogout = async function(){
+  await signOut(auth);
+};
+
+async function checkAccess(user){
+  try {
+    const q = query(collection(db, 'users'), where('uid', '==', user.uid));
+    const snap = await getDocs(q);
+    if(snap.empty){
+      await addDoc(collection(db, 'users'), {
+        uid: user.uid, email: user.email,
+        createdAt: serverTimestamp(), status: 'trial',
+        simsUsadas: 0, simsGratis: 2, assinaturaExpira: null
+      });
+      return { allowed: true, status: 'trial' };
+    }
+    let userData = null;
+    snap.forEach(d => userData = {...d.data(), docId: d.id});
+
+    if(userData.status === 'ativo' && userData.assinaturaExpira){
+      const expira = userData.assinaturaExpira.toDate ? userData.assinaturaExpira.toDate() : new Date(userData.assinaturaExpira);
+      if(expira > new Date()) return { allowed: true, status: 'ativo' };
+      return { allowed: false, status: 'expirado' };
+    }
+    const simsGratis = userData.simsGratis || 2;
+    const simsUsadas = userData.simsUsadas || 0;
+    if(simsUsadas < simsGratis) return { allowed: true, status: 'trial', simsRestantes: simsGratis - simsUsadas };
+    return { allowed: false, status: 'trial_expirado' };
+  } catch(e) {
+    console.error('checkAccess error:', e);
+    return { allowed: true, status: 'trial' };
+  }
+}
+
+async function incrementSimsUsadas(){
+  if(!currentUser) return;
+  try {
+    const { updateDoc, increment: firestoreIncrement } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const q = query(collection(db, 'users'), where('uid', '==', currentUser.uid));
+    const snap = await getDocs(q);
+    snap.forEach(async d => {
+      await updateDoc(doc(db, 'users', d.id), { simsUsadas: firestoreIncrement(1) });
+    });
+  } catch(e) { console.error(e); }
+}
+
+window.iniciarPagamento = async function(){
+  if(!currentUser) return;
+  const btn = document.getElementById('btn-assinar');
+  const loading = document.getElementById('paywall-loading');
+  btn.disabled = true;
+  loading.style.display = 'block';
+  try {
+    const resp = await fetch('/api/mp-checkout', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ userId: currentUser.uid, email: currentUser.email })
+    });
+    const data = await resp.json();
+    if(data.checkoutUrl){
+      window.open(data.checkoutUrl, '_blank');
+    } else {
+      showToast('Erro ao gerar link. Tente novamente.', true);
+    }
+  } catch(e) {
+    showToast('Erro ao conectar com servidor.', true);
+  } finally {
+    btn.disabled = false;
+    loading.style.display = 'none';
+  }
+};
+
+onAuthStateChanged(auth, async (user) => {
   document.getElementById('boot-loader').style.display = 'none';
-  if(user && user.email === ADMIN_EMAIL){
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-    await window.loadUsers();
+  if(user){
+    currentUser = user;
+    document.getElementById('screen-login').style.display = 'none';
+    document.getElementById('user-email-pill').textContent = user.email || 'Usuario';
+    window.scrollTo(0, 0);
+    const access = await checkAccess(user);
+    if(!access.allowed){
+      document.getElementById('screen-paywall').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+      return;
+    }
+    document.getElementById('screen-paywall').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    window.goToDashboard();
+    await loadSimulations();
   } else {
-    if(user) await signOut(auth);
-    document.getElementById('admin-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
+    currentUser = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('screen-paywall').style.display = 'none';
+    document.getElementById('screen-login').style.display = 'flex';
+    window.scrollTo(0, 0);
   }
 });
 
-// ===== CARREGAR USUÁRIOS =====
-window.loadUsers = async function(){
-  document.getElementById('table-loading').style.display = 'block';
-  document.getElementById('table-container').style.display = 'none';
-  document.getElementById('table-empty').style.display = 'none';
+// ===================== NAVIGATION =====================
+function setScreen(id){
+  document.querySelectorAll('#app .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-  try {
-    const snap = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')));
-    allUsers = [];
-    snap.forEach(d => allUsers.push({ docId: d.id, ...d.data() }));
-    updateMetrics();
-    renderTable(allUsers);
-  } catch(e) {
-    console.error(e);
-    showToast('Erro ao carregar usuários.', true);
-  } finally {
-    document.getElementById('table-loading').style.display = 'none';
+window.goToDashboard = function(){
+  setScreen('screen-dashboard');
+  renderDashboard();
+};
+
+window.startNewSimulation = function(){
+  editingSimId = null;
+  resetForm();
+  document.getElementById('form-title').textContent = 'Nova simulação';
+  currentStep = 1;
+  renderStep();
+  setScreen('screen-form');
+};
+
+function resetForm(){
+  document.querySelectorAll('#sim-form input').forEach(i => i.value = '');
+  const el2 = document.getElementById('f-dias2-display');
+  if(el2) el2.textContent = '— dias';
+  const prev = document.getElementById('previsao-display');
+  if(prev) prev.innerHTML = '<span style="color:var(--sand-dim)">Preencha os dados acima para ver a previsão</span>';
+}
+
+// ===================== STEPS =====================
+function renderStep(){
+  document.querySelectorAll('.form-step').forEach(s => {
+    s.style.display = (parseInt(s.dataset.step) === currentStep) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.form-progress .step').forEach(el => {
+    const n = parseInt(el.dataset.step);
+    el.classList.toggle('done', n < currentStep);
+    el.classList.toggle('active', n === currentStep);
+  });
+  const btnPrev = document.getElementById('btn-prev');
+  btnPrev.style.display = currentStep === 1 ? 'none' : 'inline-flex';
+  document.getElementById('btn-next').innerHTML = currentStep === TOTAL_STEPS
+    ? '<i class="ti ti-calculator"></i> Calcular resultado'
+    : 'Continuar <i class="ti ti-arrow-right"></i>';
+
+  if(currentStep === TOTAL_STEPS){
+    renderReview();
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+window.nextStep = function(){
+  if(currentStep < TOTAL_STEPS){
+    // sincronizar peso de saída da etapa 2 → etapa 3
+    const ps2 = document.getElementById('f-peso-saida-2');
+    const ps3 = document.getElementById('f-peso-saida');
+    if(ps2 && ps3 && ps2.value) ps3.value = ps2.value;
+    currentStep++;
+    renderStep();
+  } else {
+    calculateAndShowResults();
   }
 };
 
-function updateMetrics(){
-  const total = allUsers.length;
-  const agora = new Date();
-  const ativos = allUsers.filter(u => {
-    if(u.status !== 'ativo') return false;
-    if(!u.assinaturaExpira) return false;
-    const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
-    return exp > agora;
-  }).length;
-  const trial = allUsers.filter(u => u.status === 'trial').length;
-  const expirados = allUsers.filter(u => {
-    if(u.status === 'expirado') return true;
-    if(u.status === 'ativo' && u.assinaturaExpira){
-      const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
-      return exp <= agora;
-    }
-    return false;
-  }).length;
+window.prevStep = function(){
+  if(currentStep > 1){
+    currentStep--;
+    renderStep();
+  }
+};
 
-  document.getElementById('m-total').textContent = total;
-  document.getElementById('m-ativos').textContent = ativos;
-  document.getElementById('m-trial').textContent = trial;
-  document.getElementById('m-expirados').textContent = expirados;
-  document.getElementById('m-receita').textContent = (ativos * 115).toLocaleString('pt-BR', {style:'currency',currency:'BRL'});
+function val(id){
+  const v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? 0 : v;
+}
+function txt(id){
+  return document.getElementById(id).value.trim();
 }
 
-function renderTable(users){
-  if(users.length === 0){
-    document.getElementById('table-empty').style.display = 'block';
-    document.getElementById('table-container').style.display = 'none';
-    document.getElementById('user-count').textContent = '0 usuários';
+function renderReview(){
+  const nome = txt('f-nome') || '(sem nome)';
+  const html = `
+    <div><strong style="color:var(--sand)">${escapeHtml(nome)}</strong></div>
+    <div>Lote: ${val('f-qtd-animais') || 1} animais</div>
+    <div>Entrada: ${val('f-peso-entrada')} kg a R$ ${fmtNum(val('f-valor-kg-compra'))}/kg</div>
+    <div>Dieta inicial: ${val('f-dias1')} dias · GMD ${fmtNum(val('f-gmd1'))} kg</div>
+    <div>Dieta final: ${calcDias2()} dias · GMD ${fmtNum(val('f-gmd2'))} kg</div>
+    <div>Saída: ${val('f-peso-saida')} kg vivo · @ a R$ ${fmtNum(val('f-valor-arroba-venda'))}</div>
+    <div>Financiamento: ${fmtNum(val('f-valor-financiado'))}% da operação a ${fmtNum(val('f-taxa-juros'))}% a.a.</div>
+  `;
+  document.getElementById('review-summary').innerHTML = html;
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===================== CALCULATION =====================
+function calculateOperation(d){
+  // Entrada
+  const pesoCarcacaEntrada = d.pesoEntrada * (d.rcEntrada/100);
+  const valorEntrada = (d.pesoEntrada * d.valorKgCompra) + d.frete + d.protocolo;
+
+  // Dietas
+  const pesoMedio1 = (d.pesoEntrada + (d.pesoEntrada + d.gmd1 * d.dias1)) / 2;
+  const consumoDia1 = pesoMedio1 * (d.consumo1/100);
+  const custoDietaPeriodo1 = consumoDia1 * d.dias1 * d.valorDieta1;
+
+  const pesoAposFase1 = d.pesoEntrada + d.gmd1 * d.dias1;
+  const pesoMedio2 = (pesoAposFase1 + d.pesoSaida) / 2;
+  const consumoDia2 = pesoMedio2 * (d.consumo2/100);
+  const custoDietaPeriodo2 = consumoDia2 * d.dias2 * d.valorDieta2;
+
+  const custoNutricaoTotal = custoDietaPeriodo1 + custoDietaPeriodo2;
+
+  // Dias totais e operacional
+  const diasTotais = d.dias1 + d.diasAdaptacao + d.dias2;
+  const custoOperacional = d.operacionalMes * (diasTotais/30);
+
+  // Saída
+  const pesoCarcacaSaida = d.pesoSaida * (d.rcSaida/100);
+  const carcacaSaidaArroba = pesoCarcacaSaida / 15;
+  const valorBrutoVenda = carcacaSaidaArroba * d.valorArrobaVenda;
+  const valorSenarFunrural = valorBrutoVenda * (d.senarFunrural/100);
+  const taxasVenda = d.taxaAbate + valorSenarFunrural + d.acompanhamento;
+  const valorLiquidoVenda = valorBrutoVenda - taxasVenda;
+
+  // Financiamento (valorFinanciado é % da operação)
+  const custoSemJuros = valorEntrada + custoNutricaoTotal + custoOperacional;
+  const valorFinanciadoReais = custoSemJuros * (d.pctFinanciado/100);
+  const jurosFinanciamento = valorFinanciadoReais * (d.taxaJuros/100) * (diasTotais/365);
+
+  // Desempenho
+  const ganhoPeso = d.pesoSaida - d.pesoEntrada;
+  const ganhoCarcaca = pesoCarcacaSaida - pesoCarcacaEntrada;
+  const gmdOperacao = diasTotais > 0 ? ganhoPeso / diasTotais : 0;
+  const rendimentoGanho = ganhoPeso > 0 ? (ganhoCarcaca / ganhoPeso) * 100 : 0;
+  const producaoArroba = ganhoCarcaca / 15;
+  const custoPorArroba = producaoArroba > 0 ? (custoNutricaoTotal + custoOperacional) / producaoArroba : 0;
+
+  // Balanço final
+  const desembolsoTotal = valorEntrada + custoNutricaoTotal + custoOperacional + jurosFinanciamento;
+  const lucroLiquido = valorLiquidoVenda - desembolsoTotal;
+  const rentabilidade = desembolsoTotal > 0 ? (lucroLiquido / desembolsoTotal) * 100 : 0;
+  const rentabilidadeMes = diasTotais > 0 ? rentabilidade / (diasTotais/30) : 0;
+
+  // Totais do lote
+  const qtd = d.qtdAnimais || 1;
+  const loteDesembolso = desembolsoTotal * qtd;
+  const loteLucro = lucroLiquido * qtd;
+  const loteReceita = valorLiquidoVenda * qtd;
+
+  return {
+    pesoCarcacaEntrada, valorEntrada,
+    custoDietaPeriodo1, custoDietaPeriodo2, custoNutricaoTotal,
+    diasTotais, custoOperacional,
+    pesoCarcacaSaida, carcacaSaidaArroba, valorBrutoVenda, taxasVenda, valorLiquidoVenda,
+    valorFinanciadoReais, jurosFinanciamento,
+    ganhoPeso, ganhoCarcaca, gmdOperacao, rendimentoGanho, producaoArroba, custoPorArroba,
+    desembolsoTotal, lucroLiquido, rentabilidade, rentabilidadeMes,
+    qtd, loteDesembolso, loteLucro, loteReceita
+  };
+}
+
+// Calcula dias da fase final automaticamente
+function calcDias2(){
+  const pesoEntrada = val('f-peso-entrada');
+  const gmd1 = val('f-gmd1');
+  const dias1 = val('f-dias1');
+  const el2 = document.getElementById('f-peso-saida-2');
+  const pesoSaida = el2 ? parseFloat(el2.value) || 0 : val('f-peso-saida');
+  const gmd2 = val('f-gmd2');
+  const pesoAposFase1 = pesoEntrada + gmd1 * dias1;
+  if(gmd2 <= 0 || pesoSaida <= pesoAposFase1) return 0;
+  return Math.round((pesoSaida - pesoAposFase1) / gmd2);
+}
+
+function calcDataAbate(){
+  const dataEntrada = document.getElementById('f-data-entrada');
+  if(!dataEntrada || !dataEntrada.value) return null;
+  const dias1 = val('f-dias1');
+  const dias2 = calcDias2();
+  const totalDias = dias1 + dias2;
+  const dt = new Date(dataEntrada.value + 'T12:00:00');
+  dt.setDate(dt.getDate() + totalDias);
+  return { data: dt, totalDias, dias2 };
+}
+
+window.updateDataAbate = function(){
+  const dataEntradaEl = document.getElementById('f-data-entrada');
+  const display = document.getElementById('data-abate-display');
+  if(!display) return;
+  if(!dataEntradaEl || !dataEntradaEl.value){
+    display.textContent = '— preencha a data de entrada';
+    return;
+  }
+  const dias1 = val('f-dias1');
+  const dias2 = calcDias2();
+  const totalDias = dias1 + dias2;
+  if(totalDias <= 0){
+    display.textContent = '— preencha os dados das dietas';
+    return;
+  }
+  const dt = new Date(dataEntradaEl.value + 'T12:00:00');
+  dt.setDate(dt.getDate() + totalDias);
+  const dtStr = dt.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  display.textContent = dtStr + ' (' + totalDias + ' dias)';
+};
+
+window.updatePrevisao = function(){
+  window.updateDias2();
+  const res = calcDataAbate();
+  const el = document.getElementById('previsao-display');
+  if(!el) return;
+  if(!res || res.totalDias <= 0){
+    el.innerHTML = '<span style="color:var(--sand-dim)">Preencha os dados acima para ver a previsão</span>';
+    return;
+  }
+  const pesoEntrada = val('f-peso-entrada');
+  const el2 = document.getElementById('f-peso-saida-2');
+  const pesoSaida = el2 ? parseFloat(el2.value)||0 : val('f-peso-saida');
+  const gmd1 = val('f-gmd1');
+  const gmd2 = val('f-gmd2');
+  const dias1 = val('f-dias1');
+  const operacionalMes = val('f-operacional-mes');
+  const valorKgCompra = val('f-valor-kg-compra');
+  const frete = val('f-frete');
+  const protocolo = val('f-protocolo');
+  const consumo1 = val('f-consumo1');
+  const consumo2 = val('f-consumo2');
+  const valorDieta1 = val('f-valor-dieta1');
+  const valorDieta2 = val('f-valor-dieta2');
+
+  const pesoMedio1 = (pesoEntrada + (pesoEntrada + gmd1*dias1))/2;
+  const custoDieta1 = pesoMedio1*(consumo1/100)*dias1*valorDieta1;
+  const pesoAposFase1 = pesoEntrada + gmd1*dias1;
+  const pesoMedio2 = (pesoAposFase1 + pesoSaida)/2;
+  const custoDieta2 = pesoMedio2*(consumo2/100)*res.dias2*valorDieta2;
+  const custoAquisicao = pesoEntrada*valorKgCompra + frete + protocolo;
+  const custoOp = operacionalMes*(res.totalDias/30);
+  const custoTotal = custoAquisicao + custoDieta1 + custoDieta2 + custoOp;
+
+  const dtStr = res.data.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  el.innerHTML = `
+    <div class="kv-row"><span class="k">Data prevista de abate</span><span class="v" style="color:var(--gold);font-size:16px;">${dtStr}</span></div>
+    <div class="kv-row"><span class="k">Dias totais de operação</span><span class="v num">${res.totalDias} dias</span></div>
+    <div class="kv-row"><span class="k">Peso estimado na saída</span><span class="v num">${pesoSaida > 0 ? pesoSaida + ' kg' : '—'}</span></div>
+    <div class="kv-row total"><span class="k">Custo acumulado estimado</span><span class="v num" style="color:var(--terracotta);">${custoTotal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</span></div>
+  `;
+};
+
+window.syncPesoSaida = function(el){
+  // sincroniza campo de saída (etapa 3) com o da etapa 2
+  const el2 = document.getElementById('f-peso-saida-2');
+  if(el2) el2.value = el.value;
+  window.updateDias2();
+};
+
+window.updateDias2 = function(){
+  const dias2 = calcDias2();
+  const el = document.getElementById('f-dias2-display');
+  if(el) el.textContent = dias2 > 0 ? dias2 + ' dias' : '— dias';
+};
+
+// updatePrevisao chama updateDias2 internamente
+
+
+function gatherFormData(){
+  return {
+    nome: txt('f-nome') || 'Simulação sem nome',
+    pesoEntrada: val('f-peso-entrada'),
+    valorKgCompra: val('f-valor-kg-compra'),
+    frete: val('f-frete'),
+    protocolo: val('f-protocolo'),
+    rcEntrada: val('f-rc-entrada'),
+    operacionalMes: val('f-operacional-mes'),
+    gmd1: val('f-gmd1'),
+    dias1: val('f-dias1'),
+    valorDieta1: val('f-valor-dieta1'),
+    consumo1: val('f-consumo1'),
+    diasAdaptacao: 0,
+    gmd2: val('f-gmd2'),
+    dias2: calcDias2(),
+    valorDieta2: val('f-valor-dieta2'),
+    consumo2: val('f-consumo2'),
+    pesoSaida: (function(){ const el = document.getElementById('f-peso-saida-2'); return el && el.value ? parseFloat(el.value)||0 : val('f-peso-saida'); })(),
+    rcSaida: val('f-rc-saida'),
+    valorArrobaVenda: val('f-valor-arroba-venda'),
+    taxaAbate: val('f-taxa-abate'),
+    senarFunrural: val('f-senar-funrural'),
+    acompanhamento: val('f-acompanhamento'),
+    pctFinanciado: val('f-valor-financiado'),
+    qtdAnimais: Math.max(1, val('f-qtd-animais') || 1),
+    taxaJuros: val('f-taxa-juros')
+  };
+}
+
+let lastCalcResult = null;
+let lastCalcInput = null;
+
+function calculateAndShowResults(){
+  const data = gatherFormData();
+  const r = calculateOperation(data);
+  lastCalcResult = r;
+  lastCalcInput = data;
+  renderResults(data, r);
+  document.getElementById('btn-delete-sim').style.display = editingSimId ? 'inline-flex' : 'none';
+  setScreen('screen-results');
+}
+
+// ===================== RESULTS RENDER =====================
+function fmtBRL(n){
+  return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+function fmtNum(n, dec=2){
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+}
+
+function renderResults(d, r){
+  document.getElementById('results-title').textContent = d.nome;
+
+  const banner = document.getElementById('verdict-banner');
+  const isPositive = r.lucroLiquido >= 0;
+  banner.classList.remove('pos','neg');
+  banner.classList.add(isPositive ? 'pos' : 'neg');
+
+  document.getElementById('verdict-label').textContent = isPositive ? 'Lucro estimado da operação' : 'Prejuízo estimado da operação';
+  const verdictValue = document.getElementById('verdict-value');
+  verdictValue.textContent = fmtBRL(r.lucroLiquido);
+  verdictValue.classList.remove('pos','neg');
+  verdictValue.classList.add(isPositive ? 'pos' : 'neg');
+  document.getElementById('verdict-sub').textContent = `Rentabilidade: ${fmtNum(r.rentabilidade)}% no período (${fmtNum(r.rentabilidadeMes)}% ao mês) · ${r.diasTotais} dias de operação`;
+
+  // thermometer: clamp rentabilidade between -30% and +30% for pointer position
+  const clamped = Math.max(-30, Math.min(30, r.rentabilidade));
+  const pct = ((clamped + 30) / 60) * 100;
+  document.getElementById('thermo-pointer').style.left = pct + '%';
+
+  // Custos
+  document.getElementById('r-nutricao').textContent = fmtBRL(r.custoNutricaoTotal);
+  document.getElementById('r-operacional').textContent = fmtBRL(r.custoOperacional);
+  document.getElementById('r-aquisicao').textContent = fmtBRL(r.valorEntrada);
+  document.getElementById('r-juros').textContent = fmtBRL(r.jurosFinanciamento);
+  document.getElementById('r-desembolso').textContent = fmtBRL(r.desembolsoTotal);
+
+  // Desempenho
+  document.getElementById('r-dias').textContent = r.diasTotais + ' dias';
+  document.getElementById('r-ganho-peso').textContent = fmtNum(r.ganhoPeso) + ' kg';
+  document.getElementById('r-ganho-carcaca').textContent = fmtNum(r.ganhoCarcaca) + ' kg';
+  document.getElementById('r-gmd').textContent = fmtNum(r.gmdOperacao, 3) + ' kg/dia';
+  document.getElementById('r-rendimento').textContent = fmtNum(r.rendimentoGanho) + '%';
+  document.getElementById('r-custo-arroba').textContent = fmtBRL(r.custoPorArroba);
+
+  // Receita
+  document.getElementById('r-carcaca-saida').textContent = fmtNum(r.carcacaSaidaArroba) + ' @';
+  document.getElementById('r-bruto').textContent = fmtBRL(r.valorBrutoVenda);
+  document.getElementById('r-taxas-venda').textContent = fmtBRL(r.taxasVenda);
+  document.getElementById('r-liquido-venda').textContent = fmtBRL(r.valorLiquidoVenda);
+
+  // Final
+  document.getElementById('r-receita').textContent = fmtBRL(r.valorLiquidoVenda);
+  document.getElementById('r-desembolso2').textContent = fmtBRL(r.desembolsoTotal);
+  const lucroEl = document.getElementById('r-lucro');
+  lucroEl.textContent = fmtBRL(r.lucroLiquido);
+  lucroEl.style.color = isPositive ? 'var(--green)' : 'var(--terracotta)';
+  document.getElementById('r-rentabilidade').textContent = fmtNum(r.rentabilidade) + '%';
+  document.getElementById('r-rentabilidade-mes').textContent = fmtNum(r.rentabilidadeMes) + '%';
+
+  // Totais do lote
+  const qtd = r.qtd || 1;
+  document.getElementById('lote-title').textContent = `Total do lote (${qtd} animais)`;
+  document.getElementById('r-lote-desembolso').textContent = fmtBRL(r.loteDesembolso || r.desembolsoTotal * qtd);
+  document.getElementById('r-lote-receita').textContent = fmtBRL(r.loteReceita || r.valorLiquidoVenda * qtd);
+  const loteLucroEl = document.getElementById('r-lote-lucro');
+  const loteLucro = r.loteLucro || r.lucroLiquido * qtd;
+  loteLucroEl.textContent = fmtBRL(loteLucro);
+  loteLucroEl.style.color = loteLucro >= 0 ? 'var(--green)' : 'var(--terracotta)';
+}
+
+// ===================== PERSISTENCE (Firestore) =====================
+async function loadSimulations(){
+  if(!currentUser) return;
+  document.getElementById('dashboard-loading').style.display = 'block';
+  document.getElementById('empty-dashboard').style.display = 'none';
+  document.getElementById('sim-grid').style.display = 'none';
+
+  try{
+    const q = query(
+      collection(db, 'simulations'),
+      where('userId', '==', currentUser.uid),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    simulations = [];
+    snap.forEach(docSnap => {
+      simulations.push({ id: docSnap.id, ...docSnap.data() });
+    });
+  }catch(err){
+    console.error('Erro ao carregar simulações:', err);
+    showToast('Não foi possível carregar suas simulações.', true);
+    simulations = [];
+  }finally{
+    document.getElementById('dashboard-loading').style.display = 'none';
+    renderDashboard();
+  }
+}
+
+function renderDashboard(){
+  const grid = document.getElementById('sim-grid');
+  const empty = document.getElementById('empty-dashboard');
+  const count = document.getElementById('sim-count');
+
+  count.textContent = simulations.length === 0
+    ? 'Nenhuma simulação salva'
+    : `${simulations.length} simulação${simulations.length > 1 ? 'ões' : ''} salva${simulations.length > 1 ? 's' : ''}`;
+
+  if(simulations.length === 0){
+    grid.style.display = 'none';
+    empty.style.display = 'block';
     return;
   }
 
-  document.getElementById('table-container').style.display = 'block';
-  document.getElementById('table-empty').style.display = 'none';
-  document.getElementById('user-count').textContent = `${users.length} usuário${users.length !== 1 ? 's' : ''}`;
-
-  const agora = new Date();
-  const tbody = document.getElementById('users-tbody');
-  tbody.innerHTML = users.map(u => {
-    const criado = u.createdAt && u.createdAt.toDate ? u.createdAt.toDate().toLocaleDateString('pt-BR') : '—';
-    let expiraStr = '—';
-    let statusReal = u.status || 'trial';
-    if(u.assinaturaExpira){
-      const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
-      expiraStr = exp.toLocaleDateString('pt-BR');
-      if(u.status === 'ativo' && exp <= agora) statusReal = 'expirado';
-    }
-    const simsUsadas = u.simsUsadas || 0;
-    const simsGratis = u.simsGratis || 2;
-    const badge = statusReal === 'ativo'
-      ? '<span class="badge ativo"><i class="ti ti-check"></i> Ativo</span>'
-      : statusReal === 'trial'
-      ? `<span class="badge trial"><i class="ti ti-clock"></i> Trial (${simsUsadas}/${simsGratis})</span>`
-      : '<span class="badge expirado"><i class="ti ti-x"></i> Expirado</span>';
-
-    return `<tr>
-      <td style="font-family:'Roboto Mono';font-size:13px;">${u.email || '—'}</td>
-      <td>${badge}</td>
-      <td class="num">${simsUsadas}</td>
-      <td>${criado}</td>
-      <td>${expiraStr}</td>
-      <td>
-        <button class="btn btn-ghost btn-sm" onclick="window.abrirModal('${u.docId}')">
-          <i class="ti ti-edit"></i> Editar
+  empty.style.display = 'none';
+  grid.style.display = 'grid';
+  grid.innerHTML = simulations.map(s => {
+    const r = s.result || {};
+    const isPositive = (r.lucroLiquido || 0) >= 0;
+    const dateStr = s.createdAt && s.createdAt.toDate ? s.createdAt.toDate().toLocaleDateString('pt-BR') : '';
+    return `
+      <div class="sim-card" onclick="window.openSimulation('${s.id}')">
+        <div class="bar ${isPositive ? 'pos' : 'neg'}"></div>
+        <button class="del" onclick="event.stopPropagation(); window.deleteSimulation('${s.id}')" title="Excluir">
+          <i class="ti ti-trash"></i>
         </button>
-      </td>
-    </tr>`;
+        <div class="name">${escapeHtml(s.nome || 'Sem nome')}</div>
+        <div class="date">${dateStr}</div>
+        <div class="result-row">
+          <span class="result-label">Resultado</span>
+          <span class="result-value ${isPositive ? 'pos' : 'neg'}">${fmtBRL(r.lucroLiquido || 0)}</span>
+        </div>
+        <div class="rent">Rentabilidade: ${fmtNum(r.rentabilidade || 0)}%</div>
+      </div>
+    `;
   }).join('');
 }
 
-window.filterUsers = function(){
-  const search = document.getElementById('search-input').value.toLowerCase();
-  const status = document.getElementById('filter-status').value;
-  const filtered = allUsers.filter(u => {
-    const matchEmail = !search || (u.email || '').toLowerCase().includes(search);
-    const matchStatus = !status || (u.status || 'trial') === status;
-    return matchEmail && matchStatus;
-  });
-  renderTable(filtered);
+window.openSimulation = function(id){
+  const sim = simulations.find(s => s.id === id);
+  if(!sim) return;
+  editingSimId = id;
+  lastCalcInput = sim.input;
+  lastCalcResult = sim.result;
+  renderResults(sim.input, sim.result);
+  document.getElementById('btn-delete-sim').style.display = 'inline-flex';
+  setScreen('screen-results');
 };
 
-// ===== MODAL =====
-window.abrirModal = function(docId){
-  const u = allUsers.find(x => x.docId === docId);
-  if(!u) return;
-  editingDocId = docId;
-  document.getElementById('modal-email').textContent = u.email || '—';
-  document.getElementById('modal-status').value = u.status || 'trial';
-  document.getElementById('modal-sims-gratis').value = u.simsGratis || 2;
-  if(u.assinaturaExpira){
-    const exp = u.assinaturaExpira.toDate ? u.assinaturaExpira.toDate() : new Date(u.assinaturaExpira);
-    document.getElementById('modal-expira').value = exp.toISOString().split('T')[0];
-  } else {
-    document.getElementById('modal-expira').value = '';
+window.saveAndPrint = async function(){
+  await window.saveSimulation();
+  window.printRelatorio();
+};
+
+window.printRelatorio = function(){
+  if(!lastCalcInput || !lastCalcResult) return;
+  const d = lastCalcInput;
+  const r = lastCalcResult;
+
+  // Preencher header PDF
+  document.getElementById('pdf-nome-sim').textContent = d.nome || 'Simulação';
+  document.getElementById('pdf-data-geracao').innerHTML =
+    'Gerado em: ' + new Date().toLocaleDateString('pt-BR') + '<br>' + d.qtdAnimais + ' animais';
+
+  // Dados de entrada
+  document.getElementById('pdf-dados-entrada').innerHTML = [
+    ['Peso de entrada', d.pesoEntrada + ' kg'],
+    ['Valor do kg', fmtBRL(d.valorKgCompra)],
+    ['Frete', fmtBRL(d.frete)],
+    ['Protocolo sanitário', fmtBRL(d.protocolo)],
+    ['RC na chegada', d.rcEntrada + '%'],
+    ['Operacional/cab/mês', fmtBRL(d.operacionalMes)],
+  ].map(([k,v]) => `<div class="prow"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Dados dietas
+  document.getElementById('pdf-dados-dietas').innerHTML = [
+    ['GMD fase inicial', d.gmd1 + ' kg/dia'],
+    ['Dias fase inicial', d.dias1 + ' dias'],
+    ['Custo kg dieta 1', fmtBRL(d.valorDieta1)],
+    ['CMS fase 1', d.consumo1 + '%'],
+    ['GMD fase final', d.gmd2 + ' kg/dia'],
+    ['Dias fase final', r.diasTotais - d.dias1 + ' dias'],
+    ['Custo kg dieta 2', fmtBRL(d.valorDieta2)],
+    ['CMS fase 2', d.consumo2 + '%'],
+  ].map(([k,v]) => `<div class="prow"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Dados saída
+  document.getElementById('pdf-dados-saida').innerHTML = [
+    ['Peso vivo de saída', d.pesoSaida + ' kg'],
+    ['RC de saída', d.rcSaida + '%'],
+    ['Valor da @', fmtBRL(d.valorArrobaVenda)],
+    ['Taxa de abate', fmtBRL(d.taxaAbate)],
+    ['Senar + Funrural', d.senarFunrural + '%'],
+    ['Financiado', d.pctFinanciado + '% a ' + d.taxaJuros + '% a.a.'],
+  ].map(([k,v]) => `<div class="prow"><span>${k}</span><span>${v}</span></div>`).join('');
+
+  // Mostrar elementos PDF
+  document.querySelectorAll('.pdf-header, .pdf-dados').forEach(el => el.style.display = 'block');
+  window.print();
+  // Esconder após imprimir
+  setTimeout(() => {
+    document.querySelectorAll('.pdf-header, .pdf-dados').forEach(el => el.style.display = 'none');
+  }, 1000);
+};
+
+window.saveSimulation = async function(){
+  if(!currentUser || !lastCalcInput || !lastCalcResult){
+    showToast('Calcule uma simulação antes de salvar.', true);
+    return;
   }
-  document.getElementById('modal-user').classList.add('open');
-};
-
-window.fecharModal = function(){
-  document.getElementById('modal-user').classList.remove('open');
-  editingDocId = null;
-};
-
-window.salvarUsuario = async function(){
-  if(!editingDocId) return;
-  const status = document.getElementById('modal-status').value;
-  const simsGratis = parseInt(document.getElementById('modal-sims-gratis').value) || 2;
-  const expiraVal = document.getElementById('modal-expira').value;
-
-  const update = { status, simsGratis };
-  if(expiraVal){
-    update.assinaturaExpira = new Date(expiraVal + 'T23:59:59');
-  }
-
-  try {
-    await updateDoc(doc(db, 'users', editingDocId), update);
-    showToast('Usuário atualizado!');
-    fecharModal();
-    await window.loadUsers();
-  } catch(e) {
-    showToast('Erro ao salvar.', true);
+  try{
+    await addDoc(collection(db, 'simulations'), {
+      userId: currentUser.uid,
+      nome: lastCalcInput.nome,
+      input: lastCalcInput,
+      result: lastCalcResult,
+      createdAt: serverTimestamp()
+    });
+    showToast('Simulação salva com sucesso.');
+    await incrementSimsUsadas();
+    await loadSimulations();
+    window.goToDashboard();
+  }catch(err){
+    console.error('Erro ao salvar:', err);
+    showToast('Não foi possível salvar a simulação.', true);
   }
 };
 
-// ===== TOAST =====
+window.deleteSimulation = async function(id){
+  if(!confirm('Excluir essa simulação? Essa ação não pode ser desfeita.')) return;
+  try{
+    await deleteDoc(doc(db, 'simulations', id));
+    showToast('Simulação excluída.');
+    await loadSimulations();
+  }catch(err){
+    console.error('Erro ao excluir:', err);
+    showToast('Não foi possível excluir.', true);
+  }
+};
+
+window.deleteCurrentSimulation = async function(){
+  if(!editingSimId) return;
+  await window.deleteSimulation(editingSimId);
+  window.goToDashboard();
+};
+
+window.duplicateFromResults = function(){
+  if(!lastCalcInput) return;
+  editingSimId = null;
+  const d = lastCalcInput;
+  document.getElementById('f-nome').value = d.nome + ' (cópia)';
+  document.getElementById('f-peso-entrada').value = d.pesoEntrada || '';
+  document.getElementById('f-valor-kg-compra').value = d.valorKgCompra || '';
+  document.getElementById('f-frete').value = d.frete || '';
+  document.getElementById('f-qtd-animais').value = d.qtdAnimais || '';
+  document.getElementById('f-protocolo').value = d.protocolo || '';
+  document.getElementById('f-rc-entrada').value = d.rcEntrada || '';
+  document.getElementById('f-operacional-mes').value = d.operacionalMes || '';
+  document.getElementById('f-gmd1').value = d.gmd1 || '';
+  document.getElementById('f-dias1').value = d.dias1 || '';
+  document.getElementById('f-valor-dieta1').value = d.valorDieta1 || '';
+  document.getElementById('f-consumo1').value = d.consumo1 || '';
+  document.getElementById('f-dias-adaptacao').value = d.diasAdaptacao || '';
+  document.getElementById('f-gmd2').value = d.gmd2 || '';
+  document.getElementById('f-dias2').value = d.dias2 || '';
+  document.getElementById('f-valor-dieta2').value = d.valorDieta2 || '';
+  document.getElementById('f-consumo2').value = d.consumo2 || '';
+  document.getElementById('f-peso-saida').value = d.pesoSaida || '';
+  const ps2 = document.getElementById('f-peso-saida-2');
+  if(ps2) ps2.value = d.pesoSaida || '';
+  document.getElementById('f-rc-saida').value = d.rcSaida || '';
+  document.getElementById('f-valor-arroba-venda').value = d.valorArrobaVenda || '';
+  document.getElementById('f-taxa-abate').value = d.taxaAbate || '';
+  document.getElementById('f-senar-funrural').value = d.senarFunrural || '';
+  document.getElementById('f-acompanhamento').value = d.acompanhamento || '';
+  document.getElementById('f-valor-financiado').value = d.valorFinanciado || '';
+  document.getElementById('f-taxa-juros').value = d.taxaJuros || '';
+
+  document.getElementById('form-title').textContent = 'Duplicar simulação';
+  currentStep = 1;
+  renderStep();
+  setScreen('screen-form');
+};
+
+// ===================== TOAST =====================
 let toastTimeout;
 function showToast(msg, isError=false){
-  const t = document.getElementById('toast');
+  const toast = document.getElementById('toast');
   document.getElementById('toast-msg').textContent = msg;
-  t.querySelector('i').style.color = isError ? 'var(--terracotta)' : 'var(--green)';
-  t.classList.add('show');
+  toast.classList.toggle('error', isError);
+  toast.querySelector('.ico').className = 'ti ' + (isError ? 'ti-alert-circle' : 'ti-circle-check') + ' ico';
+  toast.classList.add('show');
   clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), 3000);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
 }
 window.showToast = showToast;
+window.fmtNum = fmtNum;
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.log('SW erro:', err));
+  });
+}
 </script>
 </body>
 </html>

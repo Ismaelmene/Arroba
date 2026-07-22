@@ -1551,9 +1551,7 @@ window.duplicateFromResults = function(){
   document.getElementById('f-dias1').value = d.dias1 || '';
   document.getElementById('f-valor-dieta1').value = d.valorDieta1 || '';
   document.getElementById('f-consumo1').value = d.consumo1 || '';
-  document.getElementById('f-dias-adaptacao').value = d.diasAdaptacao || '';
   document.getElementById('f-gmd2').value = d.gmd2 || '';
-  document.getElementById('f-dias2').value = d.dias2 || '';
   document.getElementById('f-valor-dieta2').value = d.valorDieta2 || '';
   document.getElementById('f-consumo2').value = d.consumo2 || '';
   document.getElementById('f-peso-saida').value = d.pesoSaida || '';
@@ -1564,13 +1562,17 @@ window.duplicateFromResults = function(){
   document.getElementById('f-taxa-abate').value = d.taxaAbate || '';
   document.getElementById('f-senar-funrural').value = d.senarFunrural || '';
   document.getElementById('f-acompanhamento').value = d.acompanhamento || '';
-  document.getElementById('f-valor-financiado').value = d.valorFinanciado || '';
+  document.getElementById('f-valor-financiado').value = d.pctFinanciado || '';
   document.getElementById('f-taxa-juros').value = d.taxaJuros || '';
 
   document.getElementById('form-title').textContent = 'Duplicar simulação';
   currentStep = 1;
   renderStep();
   setScreen('screen-form');
+
+  // Atualiza os cálculos automáticos (dias, previsão de abate) que só
+  // recalculam com eventos de digitação — sem isso ficariam desatualizados.
+  if(window.updatePrevisao) window.updatePrevisao();
 };
 
 // ===================== TOAST =====================
